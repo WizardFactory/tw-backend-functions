@@ -23,7 +23,7 @@ class ControllerDynamdb {
     }
 
     _getDb(params, callback) {
-        console.info({_getDb:{params: params}});
+        console.info(JSON.stringify({_getDb:{params: params}}));
         dynamoDb.get(params, (err, result) => {
             if (err) {
                 return callback(err);
@@ -33,7 +33,7 @@ class ControllerDynamdb {
     }
 
     _updateDb(params, callback) {
-        console.info({_updateDb:{params: params}});
+        console.info(JSON.stringify({_updateDb:{params: params}}));
         dynamoDb.update(params, (err, result) => {
             // handle potential errors
             if (err) {

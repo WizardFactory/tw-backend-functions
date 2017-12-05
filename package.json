@@ -7,7 +7,9 @@
     "test": "mocha ./test",
     "offline": "sls offline start",
     "e2etest": "",
-    "deploy": "sls deploy -v"
+    "deploy": "sls deploy -v",
+    "deploy-coord2addr": "sls deploy -f coord2addr -v",
+    "deploy-pro": "sls deploy -s production -v"
   },
   "author": "alec kim",
   "dependencies": {

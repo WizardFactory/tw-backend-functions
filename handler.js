@@ -6,7 +6,7 @@
 
 const GeoCode = require('./function.geocode');
 
-function makeResponse(err, result) {
+function makeResponse(err, result, cacheTime) {
     if (err) {
         console.error(err);
         return {
@@ -18,8 +18,8 @@ function makeResponse(err, result) {
     else {
         return {
             statusCode: 200,
-            headers: {'Content-Type': 'application/json; charset=UTF-8'},
-            body: result};
+            headers: {'Content-Type': 'application/json; charset=UTF-8', 'cache-control': 'max-age='+cacheTime},
+            body: JSON.stringify(result)};
     }
 }
 
@@ -27,7 +27,7 @@ module.exports.coord2addr = (event, context, callback) => {
     new GeoCode().coord2geoInfo(event, (err, result) => {
         let response;
         try {
-            response = makeResponse(err, result);
+            response = makeResponse(err, result, 2592000); //1month
         }
         catch (err) {
             return callback(err);
@@ -40,7 +40,7 @@ module.exports.addr2coord = (event, context, callback) => {
     new GeoCode().addr2geoInfo(event, (err, result) => {
         let response;
         try {
-            response = makeResponse(err, result);
+            response = makeResponse(err, result, 2592000); //1month
         }
         catch (err) {
             return callback(err);
