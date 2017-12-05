@@ -1,0 +1,24 @@
+{
+  "name": "tw-backend-functions",
+  "version": "0.1.0",
+  "description": "FaaS for Todayweather",
+  "main": "handler.js",
+  "scripts": {
+    "test": "mocha ./test",
+    "offline": "sls offline start",
+    "e2etest": "",
+    "deploy": "sls deploy -v"
+  },
+  "author": "alec kim",
+  "dependencies": {
+    "async": "^2.6.0",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.162.0",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "serverless-dynamodb-local": "^0.2.26",
+    "serverless-offline": "^3.16.0"
+  }
+}
