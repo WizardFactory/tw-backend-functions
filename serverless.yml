@@ -84,16 +84,16 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  coord2addr:
-    handler: handler.coord2addr
+  geoinfobycoord:
+    handler: handler.geoinfobycoord
     events:
       - http:
           path: geocode/coord/{lat}/{lng}
           method: get
           cors: true
 
-  addr2coord:
-    handler: handler.add2coord
+  geoinfobyaddr:
+    handler: handler.geoinfobyaddr
     events:
       - http:
           path: geocode/addr/{address}
