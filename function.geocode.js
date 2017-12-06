@@ -50,7 +50,7 @@ class GeoCode {
     }
 
     _getLanguage(event) {
-        if (!event.headers.hasOwnProperty('Accept-Language')) {
+        if (!event.headers || !event.headers.hasOwnProperty('Accept-Language')) {
             return 'en';
         }
         return event.headers['Accept-Language'].split('-')[0];
