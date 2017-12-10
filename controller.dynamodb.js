@@ -95,8 +95,22 @@ class ControllerDynamdb {
             return this;
         }
 
-        let updateExpression = 'SET loc = :loc, lang = :lang, country = :country, address = :address';
-            updateExpression += ', label = :label, kmaAddress = :kmaAddress, updatedAt = :updatedAt';
+        let updateExpression = 'SET loc = :loc, lang = :lang, country = :country, address = :address' +
+            ', label = :label, updatedAt = :updatedAt';
+
+        let expressionAttributeValues = {
+            ':loc': geoInfo.loc,
+            ':lang': geoInfo.lang,
+            ':country': geoInfo.country,
+            ':address': geoInfo.address,
+            ':label': geoInfo.label,
+            ':updatedAt': timestamp
+        };
+
+        if (geoInfo.kmaAddress) {
+            updateExpression += ', kmaAddress = :kmaAddress';
+            expressionAttributeValues[':kmaAddress'] = geoInfo.kmaAddress;
+        }
 
         const params = {
             TableName: process.env.DYNAMODB_TABLE,
@@ -104,15 +118,7 @@ class ControllerDynamdb {
                 id: geoInfo.id,
             },
             UpdateExpression: updateExpression,
-            ExpressionAttributeValues: {
-                ':loc': geoInfo.loc,
-                ':lang': geoInfo.lang,
-                ':country': geoInfo.country,
-                ':address': geoInfo.address,
-                ':label': geoInfo.label,
-                ':kmaAddress': geoInfo.kmaAddress,
-                ':updatedAt': timestamp
-            },
+            ExpressionAttributeValues: expressionAttributeValues,
             ReturnValues: 'UPDATED_NEW'
         };
 

@@ -61,7 +61,8 @@ class GeoCode {
         let lang;
         try {
             console.log(event);
-            loc = [Number(event.pathParameters.lat), Number(event.pathParameters.lng)];
+            let eventLocation = decodeURIComponent(event.pathParameters.loc).split(',');
+            loc = [Number(eventLocation[0]), Number(eventLocation[1])];
             lang = this._getLanguage(event);
             console.info({coord2geoInfo:{loc: loc, lang: lang}});
         }

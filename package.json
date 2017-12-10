@@ -8,7 +8,7 @@
     "offline": "sls offline start",
     "e2etest": "",
     "deploy": "sls deploy -v",
-    "deploy-coord2addr": "sls deploy -f coord2addr -v",
+    "deploy-geoinfobycoord": "sls deploy -f geoinfobycoord -v",
     "deploy-pro": "sls deploy -s production -v"
   },
   "author": "alec kim",

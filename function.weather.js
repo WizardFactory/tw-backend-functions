@@ -8,11 +8,14 @@ const async = require('async');
 const request = require('request');
 
 const GeoCode = require('./function.geocode');
+const config = require('./config');
 
 class Weather {
     constructor() {
         this.geoCode = new GeoCode();
         this.lang = 'en';
+        this.url = config.serviceServer.url;
+        this.version = config.serviceServer.version;
     }
 
     _request(url, callback) {
@@ -31,9 +34,10 @@ class Weather {
     };
 
     _geoinfo2url(geoInfo) {
-        let url = 'https://todayweather.wizardfactory.net';
+        console.info({geoInfo: geoInfo});
+        let url = this.url + '/' + this.version;
         if (geoInfo.country === 'KR') {
-            url += '/v000803/town';
+            url += '/kma/addr';
             if (geoInfo.kmaAddress.name1 && geoInfo.kmaAddress.name1.length > 0)  {
                 url += '/'+ encodeURIComponent(geoInfo.kmaAddress.name1);
             }
@@ -46,10 +50,25 @@ class Weather {
             return url;
         }
         else {
-            url += '/ww/010000/current/2';
-            url += "?gcode=" + geoInfo.loc.lat + ','+geoInfo.loc.lng;
+            url += '/dsf/coord';
+            url += '/' + geoInfo.loc[0] + ','+geoInfo.loc[1];
             return url;
         }
+    }
+
+    _appendQueryParameters(event, url) {
+        let querys;
+        let count = 0;
+        if (!event.hasOwnProperty('queryStringParameters')) {
+            return url;
+        }
+        querys = event.queryStringParameters;
+        for (let key in querys) {
+            url += count === 0? '?':'&';
+            url += key+'='+querys[key];
+            count ++;
+        }
+        return url;
     }
 
     byCoord(event, callback) {
@@ -70,6 +89,7 @@ class Weather {
                 let url;
                 try {
                     url = this._geoinfo2url(geoInfo);
+                    url = this._appendQueryParameters(event, url);
                 }
                 catch (err) {
                     callback(err);
