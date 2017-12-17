@@ -71,6 +71,22 @@ class Weather {
         return url;
     }
 
+    _importGeoInfo(dest, source) {
+        ['label', 'country', 'address', 'loc'].forEach(function (propertyName) {
+            if (source.hasOwnProperty(propertyName)) {
+                if (propertyName === 'label') {
+                    dest.name = source.label;
+                }
+                else if (propertyName === 'loc') {
+                    dest.location = {lat: source.loc[0], long:source.loc[1]};
+                }
+                else {
+                    dest[propertyName] = source[propertyName];
+                }
+            }
+        });
+    }
+
     byCoord(event, callback) {
         try{
             this.lang = event.headers['Accept-Language'];
@@ -92,10 +108,16 @@ class Weather {
                     url = this._appendQueryParameters(event, url);
                 }
                 catch (err) {
-                    callback(err);
+                    return callback(err);
                 }
                 this._request(url, (err, result)=> {
                     if (err) {
+                        return callback(err);
+                    }
+                    try {
+                        this._importGeoInfo(result, geoInfo);
+                    }
+                    catch (err) {
                         return callback(err);
                     }
                     callback(null, result);
