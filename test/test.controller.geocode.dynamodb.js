@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const ControllerDynamodb = require('../controller.dynamodb');
+const ControllerGeoCodeDb = require('../controller.geocode.dynamodb');
 
 const updateResult = { Attributes:
         { country: 'KR',
@@ -26,7 +26,7 @@ const geoInfo = { country: 'KR',
 
 describe('test controller dynamodb', () => {
     it('test update db', (done)=> {
-        let ctrlDynamodb = new ControllerDynamodb();
+        let ctrlDynamodb = new ControllerGeoCodeDb();
         ctrlDynamodb._updateDb = (params, callback) => {
             callback(null, updateResult);
         };

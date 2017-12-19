@@ -11,9 +11,10 @@ const ControllerExternalApi = require('./controller.externalapi');
 const config = require('./config');
 
 class ControllerGoogle extends ControllerExternalApi {
-    constructor(loc, lang) {
-        super(loc, lang);
+    constructor() {
+        super();
         this.keys = [config.keyString.google_key];
+        this.endpoint = "https://maps.googleapis.com/maps/api/geocode/json";
     }
 
     _getAddressInfoFromGoogleResult(result) {
@@ -121,7 +122,10 @@ class ControllerGoogle extends ControllerExternalApi {
         return {label: label, address:address};
     }
 
-    _coord2geoInfo(data) {
+    _coord2geoInfo(data, loc, lang) {
+        loc = loc?loc:this.loc;
+        lang = lang?lang:this.lang;
+
         if (data.status !== "OK") {
             //'ZERO_RESULTS', 'OVER_QUERY_LIMIT', 'REQUEST_DENIED',  'INVALID_REQUEST', 'UNKNOWN_ERROR'
             throw new Error(data.status);
@@ -200,12 +204,18 @@ class ControllerGoogle extends ControllerExternalApi {
             throw new Error('failToFindLocation');
         }
 
+        geoInfo.loc = loc;
+        geoInfo.lang = lang;
+
         return geoInfo;
     }
 
-    getAddress(callback) {
+    byGeoCode(loc, lang, callback) {
+
+        this._setGeoCode(loc, lang);
+
         //retry with key
-        let url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + this.lat + "," + this.lng;
+        let url = this.endpoint + "?latlng=" + this.loc[0] + "," + this.loc[1];
         if (this.lang) {
             url += "&language="+this.lang;
         }
@@ -231,7 +241,7 @@ class ControllerGoogle extends ControllerExternalApi {
 
                 let geoInfo;
                 try {
-                    geoInfo = this._coord2geoInfo(result);
+                    geoInfo = this._coord2geoInfo(result, loc, lang);
                 }
                 catch(err) {
                     return callback(err);
@@ -242,7 +252,83 @@ class ControllerGoogle extends ControllerExternalApi {
         return this;
     };
 
-    getGeoCode(callback) {
+    _addr2geoInfo(data, addr) {
+        if (data.status !== "OK") {
+            //'ZERO_RESULTS', 'OVER_QUERY_LIMIT', 'REQUEST_DENIED',  'INVALID_REQUEST', 'UNKNOWN_ERROR'
+            throw new Error(data.status);
+        }
+
+        let results = data.results;
+        let location;
+        let country;
+
+        addr = addr || this.addr;
+
+        if (results.length == 0) {
+            throw new Error("result.length = 0");
+        }
+
+        if (results[0].geometry && results[0].geometry.location) {
+            location = [results[0].geometry.location.lat, results[0].geometry.location.lng];
+        }
+        else {
+            throw new Error("fail to parsing results");
+        }
+
+        for (let i=0; i < results[0].address_components.length; i++) {
+            if (results[0].address_components[i].types[0] == "country") {
+                country =  results[0].address_components[i].short_name;
+                break;
+            }
+        }
+
+        return {loc: location, country: country, address: addr};
+    }
+
+    /**
+     * address의 언어를 셋업하지 않으면, 주소가 영어로 옴.
+     * @param addr
+     * @param callback
+     * @returns {ControllerGoogle}
+     */
+    byAddress(addr, callback) {
+        this.addr = addr;
+        let url = this.endpoint;
+        url += '?address='+encodeURIComponent(addr);
+
+        if (this.keys[0]) {
+            url += "&key="+this.keys[0];
+        }
+        else {
+            console.warn("google api key is not valid");
+        }
+
+        async.retry(3,
+            (cb) => {
+                this._request(url, (err, result) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    cb(null, result);
+                });
+            },
+            (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                //console.log({result: JSON.stringify(result)});
+                let geoInfo;
+                try {
+                    geoInfo = this._addr2geoInfo(result, addr);
+                }
+                catch(err) {
+                    return callback(err);
+                }
+                callback(null, geoInfo);
+            });
+
+        return this;
     }
 }
 

@@ -9,9 +9,7 @@ const ControllerDaum = require('./controller.daum');
 const ControllerGoogle = require('./controller.google');
 
 class GeoApi {
-    constructor(loc, lang) {
-        this.loc = loc;
-        this.lang = lang;
+    constructor() {
     }
 
     /**
@@ -27,29 +25,29 @@ class GeoApi {
             130.6741 >= lng && lng >= 123.9523;
     }
 
-    _getAddressFromDaum(loc, lang, callback) {
-        //console.log({_getAddressFromDaum:{loc: loc, lang: lang}});
-        let ctrl = new ControllerDaum(loc);
-        ctrl.getAddress((err, result) => {
+    _getGeoInfoFromDaumGeoCode(loc, callback) {
+        //console.log({_getGeoInfoFromDaumGeoCode:{loc: loc, lang: lang}});
+        let ctrl = new ControllerDaum();
+        ctrl.byGeoCode(loc, (err, result) => {
             callback(err, result);
         });
         return this;
     };
 
-    _getAddressFromGoogle(loc, lang, callback) {
-        //console.log({_getAddressFromGoogle: {loc: loc, lang: lang}});
-        let ctrl = new ControllerGoogle(loc, lang);
-        ctrl.getAddress((err, result) => {
+    _getGeoInfoFromGoogleGeoCode(loc, lang, callback) {
+        //console.log({_getGeoInfoFromGoogleGeoCode: {loc: loc, lang: lang}});
+        let ctrl = new ControllerGoogle();
+        ctrl.byGeoCode(loc, lang, (err, result) => {
             callback(err, result);
         });
         return this;
     };
 
-    getGeoInfo(loc, lang, callback)  {
+    getGeoInfoByCoord(loc, lang, callback)  {
         loc = loc?loc:this.loc;
         lang = lang?lang:this.lang;
 
-        //console.log({getGeoInfo:{loc: loc, lang: lang}});
+        //console.log({getGeoInfoByCoord:{loc: loc, lang: lang}});
 
         let isKoreaArea;
         try {
@@ -62,7 +60,10 @@ class GeoApi {
         async.waterfall([
                 (callback) => {
                     if (isKoreaArea) {
-                        this._getAddressFromDaum(loc, lang, (err, geoInfo) => {
+                        this._getGeoInfoFromDaumGeoCode(loc, (err, geoInfo) => {
+                            if (err) {
+                                return callback(err);
+                            }
                             if (lang !== 'ko') {
                                 geoInfo.address = undefined;
                                 geoInfo.label = undefined;
@@ -72,7 +73,10 @@ class GeoApi {
                         });
                     }
                     else {
-                        this._getAddressFromGoogle(loc, lang, (err, geoInfo) => {
+                        this._getGeoInfoFromGoogleGeoCode(loc, lang, (err, geoInfo) => {
+                            if (err) {
+                                return callback(err);
+                            }
                             callback(err, geoInfo);
                         });
                     }
@@ -83,7 +87,10 @@ class GeoApi {
                         return callback(null, geoInfo);
                     }
 
-                    this._getAddressFromGoogle(loc, lang, (err, newGeoInfo) => {
+                    this._getGeoInfoFromGoogleGeoCode(loc, lang, (err, newGeoInfo) => {
+                        if (err) {
+                            return callback(err);
+                        }
                         try {
                             for(let key in newGeoInfo) {
                                 geoInfo[key] = geoInfo[key]?geoInfo[key]:newGeoInfo[key];
@@ -100,12 +107,52 @@ class GeoApi {
                 if (err) {
                     return callback(err);
                 }
-                geoInfo.loc = loc;
-                geoInfo.lang = lang;
                 callback(err, geoInfo);
             });
 
         return this;
+    }
+
+    _getGeoInfoFromDaumAddress(addr, callback) {
+        let ctrl = new ControllerDaum();
+        ctrl.byAddress(addr, (err, result) => {
+            callback(err, result);
+        });
+    }
+
+    _getGeoInfoFromGoogleAddress(addr, callback) {
+        let ctrl = new ControllerGoogle();
+        ctrl.byAddress(addr, (err, result) => {
+            callback(err, result);
+        });
+    }
+
+    getGeoInfoByAddr(addr, callback) {
+        async.tryEach(
+            [
+                (callback) => {
+                    this._getGeoInfoFromGoogleAddress(addr, (err, result)=> {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null, result);
+                    });
+                },
+                (callback) => {
+                    this._getGeoInfoFromDaumAddress(addr, (err, result)=> {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null, result);
+                    });
+                }
+            ],
+            (err, geoInfo) => {
+                if (err)   {
+                    return callback(err);
+                }
+                callback(err, geoInfo);
+            });
     }
 }
 

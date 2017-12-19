@@ -7,10 +7,7 @@
 const request = require('request');
 
 class ControllerExternalApi {
-    constructor(loc, lang) {
-        this.lat = loc[0];
-        this.lng = loc[1];
-        this.lang = lang;
+    constructor() {
     }
 
     _request(url, callback) {
@@ -25,17 +22,29 @@ class ControllerExternalApi {
             }
             callback(err, body);
         });
-    };
-
-    _coord2geoInfo(result) {
-        let geoInfo = {};
-        return geoInfo;
     }
 
-    getAddress(callback) {
-    };
+    _coord2geoInfo(result) {
+        return {};
+    }
 
-    getGeoCode(callback) {
+    _setGeoCode(loc, lang) {
+        this.loc = loc;
+        this.lang = lang;
+    }
+
+    byGeoCode(loc, lang, callback) {
+        this._setGeoCode(loc, lang);
+        let err;
+        let geoInfo = {};
+        return callback(err, geoInfo);
+    }
+
+    byAddress(addr, callback) {
+        this.addr = addr;
+        let err;
+        let geoInfo = {};
+        return callback(err, geoInfo);
     }
 }
 

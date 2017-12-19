@@ -11,12 +11,16 @@ const ControllerExternalApi = require('./controller.externalapi');
 const config = require('./config');
 
 class ControllerDaum extends ControllerExternalApi {
-    constructor(loc) {
-        super(loc);
+    constructor() {
+        super();
         this.keys = JSON.parse(config.keyString.daum_keys);
+        this.endpoint = 'https://apis.daum.net/local/geo';
     }
 
-    _coord2geoInfo(result) {
+    _coord2geoInfo(result, loc, lang) {
+        loc = loc || this.loc;
+        lang = lang || this.lang;
+
         let geoInfo = {};
         if (result.name0 === "대한민국") {
             geoInfo.country = "KR";
@@ -47,18 +51,25 @@ class ControllerDaum extends ControllerExternalApi {
             throw new Error("It is not korea");
         }
 
+        geoInfo.loc = loc;
+        geoInfo.lang = lang;
+
         return geoInfo;
     }
 
-    getAddress(callback) {
+    byGeoCode(loc, callback) {
         let index = 0;
+        let lang = 'ko';
+
+        this._setGeoCode(loc, lang);
 
         async.retry(this.keys.length,
             (cb) => {
-                let url = 'https://apis.daum.net/local/geo/coord2addr' +
+                let url = this.endpoint;
+                    url += '/coord2addr' +
                     '?apikey=' + this.keys[index] +
-                    '&longitude=' + this.lng +
-                    '&latitude=' + this.lat +
+                    '&latitude=' + this.loc[0] +
+                    '&longitude=' + this.loc[1] +
                     '&inputCoordSystem=WGS84' +
                     '&output=json';
                 index++;
@@ -76,7 +87,7 @@ class ControllerDaum extends ControllerExternalApi {
                 }
                 let geoInfo;
                 try {
-                   geoInfo = this._coord2geoInfo(result);
+                   geoInfo = this._coord2geoInfo(result, loc, lang);
                 }
                 catch (err) {
                     return callback(err);
@@ -87,7 +98,58 @@ class ControllerDaum extends ControllerExternalApi {
         return this;
     };
 
-    getGeoCode(callback) {
+    _addr2geoInfo(result, addr) {
+        let geoInfo;
+        if (result.channel.totalCount <= 0) {
+            throw new Error("Fail to find query="+addr);
+        }
+        if (result.channel.totalCount > 1) {
+            throw new Error("too many result of query="+addr);
+        }
+
+        let item = result.channel.item[0];
+        geoInfo = {};
+        geoInfo.loc = [item.lat, item.lng];
+        geoInfo.address = addr;
+        geoInfo.country = 'KR';
+
+        return geoInfo;
+    }
+
+    byAddress(addr, callback) {
+        let index = 0;
+
+        async.retry(this.keys.length,
+            (cb) => {
+                let url = this.endpoint;
+                url += '/addr2coord?apikey=' + this.keys[index] +
+                    '&q='+ encodeURIComponent(addr) +
+                    '&output=json';
+                index++;
+
+                this._request(url, (err, result) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    cb(null, result);
+                });
+            },
+            (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+                let geoInfo;
+
+                try {
+                    // console.log(JSON.stringify(result));
+                    geoInfo = this._addr2geoInfo(result, addr);
+                }
+                catch (err) {
+                    return callback(err);
+                }
+                callback(null, geoInfo);
+            });
+        return this;
     }
 }
 

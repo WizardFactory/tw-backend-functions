@@ -18,10 +18,11 @@ plugins:
   - serverless-offline
 
 custom:
-  dynamoDBTableName: "${opt:stage, self:provider.stage}-geocode"
+  dynamoGeoCodeDBTableName: "${opt:stage, self:provider.stage}-geocode"
+  dynamoAddressDBTableName: "${opt:stage, self:provider.stage}-address"
   dynamodb:
     start:
-      port: 8300
+      port: 8200
       inMemory: true
       migrate: true
     migration:
@@ -39,7 +40,8 @@ provider:
   memorySize: 512
   timeout: 25
   environment:
-    DYNAMODB_TABLE: ${self:custom.dynamoDBTableName}
+    DYNAMODB_GEOCODE_TABLE: ${self:custom.dynamoGeoCodeDBTableName}
+    DYNAMODB_ADDRESS_TABLE: ${self:custom.dynamoAddressDBTableName}
     DYNAMODB_OFFLINE_PORT: ${self:custom.dynamodb.start.port}
   iamRoleStatements:
     - Effect: Allow
@@ -50,7 +52,16 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.dynamoDBTableName}"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.dynamoGeoCodeDBTableName}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.dynamoAddressDBTableName}"
 
 # you can overwrite defaults here
 
@@ -131,7 +142,21 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.dynamoDBTableName}
+        TableName: ${self:custom.dynamoGeoCodeDBTableName}
+    AddressTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.dynamoAddressDBTableName}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

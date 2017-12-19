@@ -36,11 +36,11 @@ describe('test controller geoapi', () => {
 
     it('test geo info query seoul in korea', (done) => {
         let ctrlGeoApi = new ControllerGeoApi();
-        ctrlGeoApi._getAddressFromDaum = (location, language, callback) => {
+        ctrlGeoApi._getGeoInfoFromDaumGeoCode = (location, callback) => {
             callback(null, resultDaumOfSeoul);
         };
 
-        ctrlGeoApi.getGeoInfo(queryKoSeoul.locaiton, queryKoSeoul.lang, (err, geoInfo)=> {
+        ctrlGeoApi.getGeoInfoByCoord(queryKoSeoul.locaiton, queryKoSeoul.lang, (err, geoInfo)=> {
             expect(err).to.be.null;
             if (err) {
                 console.error(err);
@@ -48,7 +48,7 @@ describe('test controller geoapi', () => {
             else {
                 expect(geoInfo.label).to.be.equal(resultDaumOfSeoul.label);
                 expect(geoInfo.kmaAddress.town).to.equal(resultDaumOfSeoul.kmaAddress.town);
-                console.log(geoInfo);
+                //console.log(geoInfo);
             }
             done();
         });
@@ -56,15 +56,15 @@ describe('test controller geoapi', () => {
 
     it('test geo info query seoul in english', (done) => {
         let ctrlGeoApi = new ControllerGeoApi();
-        ctrlGeoApi._getAddressFromDaum = (location, language, callback) => {
+        ctrlGeoApi._getGeoInfoFromDaumGeoCode = (location, callback) => {
             callback(null, resultDaumOfSeoul);
         };
 
-        ctrlGeoApi._getAddressFromGoogle = (location, language, callback) => {
+        ctrlGeoApi._getGeoInfoFromGoogleGeoCode = (location, language, callback) => {
             callback(null, resultGoogleOfSeoul);
         };
 
-        ctrlGeoApi.getGeoInfo(queryEnSeoul.locaiton, queryEnSeoul.lang, (err, geoInfo)=> {
+        ctrlGeoApi.getGeoInfoByCoord(queryEnSeoul.locaiton, queryEnSeoul.lang, (err, geoInfo)=> {
             expect(err).to.be.null;
             if (err) {
                 console.error(err);
@@ -72,7 +72,7 @@ describe('test controller geoapi', () => {
             else {
                 expect(geoInfo.label).to.be.equal(resultGoogleOfSeoul.label);
                 expect(geoInfo.kmaAddress.town).to.equal(resultDaumOfSeoul.kmaAddress.town);
-                console.log(geoInfo);
+                //console.log(geoInfo);
             }
             done();
         });
@@ -81,18 +81,18 @@ describe('test controller geoapi', () => {
     it('test geo info query tokyo', (done) => {
         let ctrlGeoApi = new ControllerGeoApi();
 
-        ctrlGeoApi._getAddressFromGoogle = (location, language, callback) => {
+        ctrlGeoApi._getGeoInfoFromGoogleGeoCode = (location, language, callback) => {
             callback(null, resultGoogleOfTokyo);
         };
 
-        ctrlGeoApi.getGeoInfo(queryTokyo.locaiton, queryTokyo.lang, (err, geoInfo)=> {
+        ctrlGeoApi.getGeoInfoByCoord(queryTokyo.locaiton, queryTokyo.lang, (err, geoInfo)=> {
             expect(err).to.be.null;
             if (err) {
                 console.error(err);
             }
             else {
                 expect(geoInfo.label).to.be.equal(resultGoogleOfTokyo.label);
-                console.log(geoInfo);
+                //console.log(geoInfo);
             }
             done();
         });

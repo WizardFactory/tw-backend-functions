@@ -4,7 +4,7 @@
 
 'use strict';
 
-const GeoCode = require('./function.geocode');
+const GeoInfo = require('./function.geoinfo');
 const Weather = require('./function.weather');
 
 function makeResponse(err, result, cacheTime) {
@@ -27,7 +27,7 @@ function makeResponse(err, result, cacheTime) {
 }
 
 module.exports.geoinfobycoord = (event, context, callback) => {
-    new GeoCode().coord2geoInfo(event, (err, result) => {
+    new GeoInfo().byCoord(event, (err, result) => {
         let response;
         try {
             response = makeResponse(err, result, 2592000); //1month
@@ -40,7 +40,7 @@ module.exports.geoinfobycoord = (event, context, callback) => {
 };
 
 module.exports.geoinfobyaddr = (event, context, callback) => {
-    new GeoCode().addr2geoInfo(event, (err, result) => {
+    new GeoInfo().byAddr(event, (err, result) => {
         let response;
         try {
             response = makeResponse(err, result, 2592000); //1month

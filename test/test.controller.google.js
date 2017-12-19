@@ -8,7 +8,7 @@ const expect = require('chai').expect;
 
 const ControllerGoogle = require('../controller.google');
 
-const body ={
+const geoCodeBody ={
     "results" : [
         {
             "address_components" : [
@@ -554,24 +554,102 @@ const body ={
     "status" : "OK"
 };
 
+const addressBody = {
+    "results": [{
+        "address_components": [{
+            "long_name": "Jamsilbon-dong",
+            "short_name": "Jamsilbon-dong",
+            "types": ["political", "sublocality", "sublocality_level_2"]
+        }, {
+            "long_name": "Songpa-gu",
+            "short_name": "Songpa-gu",
+            "types": ["political", "sublocality", "sublocality_level_1"]
+        }, {
+            "long_name": "Seoul",
+            "short_name": "Seoul",
+            "types": ["administrative_area_level_1", "political"]
+        }, {
+            "long_name": "South Korea",
+            "short_name": "KR",
+            "types": ["country", "political"]
+        }, {
+            "long_name": "138-220",
+            "short_name": "138-220",
+            "types": ["postal_code"]
+        }],
+        "formatted_address": "Jamsilbon-dong, Songpa-gu, Seoul, South Korea",
+        "geometry": {
+            "bounds": {
+                "northeast": {
+                    "lat": 37.5130741,
+                    "lng": 127.0907212
+                },
+                "southwest": {
+                    "lat": 37.5004736,
+                    "lng": 127.0734259
+                }
+            },
+            "location": {
+                "lat": 37.5061273,
+                "lng": 127.0842945
+            },
+            "location_type": "APPROXIMATE",
+            "viewport": {
+                "northeast": {
+                    "lat": 37.5130741,
+                    "lng": 127.0907212
+                },
+                "southwest": {
+                    "lat": 37.5004736,
+                    "lng": 127.0734259
+                }
+            }
+        },
+        "place_id": "ChIJ7bllt0ykfDURonZm_i0K2Ns",
+        "types": ["political", "sublocality", "sublocality_level_2"]
+    }],
+    "status": "OK"
+};
+
 const tokyoLocation = [35.689, 139.691];
+const lang = 'en';
 
 describe('ctrl google', ()=> {
     it ('test coord2geoInfo', () => {
-        let ctrlGoogle = new ControllerGoogle(tokyoLocation);
-        let geoInfo = ctrlGoogle._coord2geoInfo(body);
+        let ctrlGoogle = new ControllerGoogle();
+        ctrlGoogle._setGeoCode(tokyoLocation, lang);
+        let geoInfo = ctrlGoogle._coord2geoInfo(geoCodeBody, tokyoLocation, lang);
         expect(geoInfo.label).to.equal('Nishishinjuku');
+        expect(geoInfo.lang).to.equal(lang);
     });
 
-    it('test getaddress', (done) => {
-        let ctrlGoogle = new ControllerGoogle(tokyoLocation);
+    it('test by geocode', (done) => {
+        let ctrlGoogle = new ControllerGoogle();
         ctrlGoogle._request = function(url, callback) {
             //console.log('test url : ',url);
-            callback(null, body);
+            callback(null, geoCodeBody);
         };
 
-        ctrlGoogle.getAddress((err, geoInfo) => {
+        ctrlGoogle.byGeoCode(tokyoLocation, lang, (err, geoInfo) => {
             expect(geoInfo.label).to.equal('Nishishinjuku');
+            expect(geoInfo.lang).to.equal(lang);
+            done();
+        });
+    });
+
+    it('test by address', (done) => {
+        let ctrlGoogle = new ControllerGoogle();
+        ctrlGoogle._request = function(url, callback) {
+            //console.log('test url : ',url);
+            callback(null, addressBody);
+        };
+
+        let addr = "서울특별시 송파구 잠실본동";
+
+        ctrlGoogle.byAddress(addr, (err, geoInfo) => {
+            expect(geoInfo.country).to.equal('KR');
+            expect(geoInfo.loc[0]).to.equal(addressBody.results[0].geometry.location.lat);
+            expect(geoInfo.loc[1]).to.equal(addressBody.results[0].geometry.location.lng);
             done();
         });
     });
