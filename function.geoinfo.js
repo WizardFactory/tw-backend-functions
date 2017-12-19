@@ -57,10 +57,20 @@ class GeoInfo {
     }
 
     _getLanguage(event) {
-        if (!event.headers || !event.headers.hasOwnProperty('Accept-Language')) {
+        if (!event.headers) {
+            console.warn('Fain to find headers');
             return 'en';
         }
-        return event.headers['Accept-Language'].split('-')[0];
+        if (event.headers.hasOwnProperty('Accept-Language')) {
+            return event.headers['Accept-Language'].split('-')[0];
+        }
+        else if (event.headers.hasOwnProperty('accept-language')) {
+            return event.headers['accept-language'].split('-')[0];
+        }
+        else {
+            console.warn('Fain to find accept-language');
+            return 'en';
+        }
     }
 
     importGeoInfo(dest, source) {
