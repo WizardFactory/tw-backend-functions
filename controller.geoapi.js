@@ -14,6 +14,7 @@ class GeoApi {
 
     /**
      * it has partial area of japan
+     * 130.6741 -> 131.88 for dokdo
      * @param loc
      * @returns {boolean}
      * @private
@@ -22,7 +23,7 @@ class GeoApi {
         let lat = loc[0];
         let lng = loc[1];
         return 39.3769 >= lat && lat >=32.6942 &&
-            130.6741 >= lng && lng >= 123.9523;
+            131.88 >= lng && lng >= 123.9523;
     }
 
     _getGeoInfoFromDaumGeoCode(loc, callback) {
