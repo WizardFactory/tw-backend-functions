@@ -45,8 +45,6 @@ class GeoApi {
     };
 
     getGeoInfoByCoord(loc, lang, callback)  {
-        loc = loc?loc:this.loc;
-        lang = lang?lang:this.lang;
 
         //console.log({getGeoInfoByCoord:{loc: loc, lang: lang}});
 
@@ -66,8 +64,9 @@ class GeoApi {
                                 return callback(err);
                             }
                             if (lang !== 'ko') {
-                                geoInfo.address = undefined;
-                                geoInfo.label = undefined;
+                                delete geoInfo.address;
+                                delete geoInfo.label;
+                                delete geoInfo.lang
                                 //fill from google api
                             }
                             callback(err, geoInfo);
