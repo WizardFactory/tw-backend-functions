@@ -9,7 +9,15 @@ const Weather = require('./function.weather');
 
 function makeResponse(err, result, cacheTime) {
     if (err) {
-        console.error(err);
+        if (err.hasOwnProperty('statusCode')) {
+            if (err.statusCode >= 500) {
+                console.error(err);
+            }
+            else if (err.statusCode >= 400) {
+                console.warn({Warning: err.message, statusCode: err.statusCode});
+            }
+        }
+
         return {
             statusCode: err.statusCode || 501,
             headers: { 'Content-Type': 'text/plain' },
