@@ -21,6 +21,8 @@
     "chai": "^4.1.2",
     "mocha": "^4.0.1",
     "serverless-dynamodb-local": "^0.2.26",
-    "serverless-offline": "^3.16.0"
+    "serverless-offline": "^3.16.0",
+    "should": "^13.1.3",
+    "supertest": "^3.0.0"
   }
 }
