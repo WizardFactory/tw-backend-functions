@@ -73,7 +73,7 @@ class Weather {
 
     _getLanguage(event) {
         if (!event.headers) {
-            console.warn('Fain to find headers');
+            console.error('Fail to find headers');
             return 'en';
         }
         if (event.headers.hasOwnProperty('Accept-Language')) {
@@ -83,7 +83,7 @@ class Weather {
             return event.headers['accept-language'].split('-')[0];
         }
         else {
-            console.warn('Fain to find accept-language');
+            console.error('Fail to find accept-language');
             return 'en';
         }
     }
