@@ -98,6 +98,11 @@ class GeoInfo {
             loc = [Number(eventLocation[0]), Number(eventLocation[1])];
             loc = this._geoCodeNormalize(loc);
             lang = this._getLanguage(event);
+            if (loc[0] === 0 && loc[1] === 0) {
+                let err = new Error("Invalid path parameters");
+                err.statusCode = 404;
+                return callback(err);
+            }
             console.info({coord2geoInfo:{loc: loc, lang: lang}});
         }
         catch(err) {
