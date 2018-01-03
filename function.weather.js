@@ -10,7 +10,14 @@ const request = require('request');
 const GeoCode = require('./function.geoinfo');
 const config = require('./config');
 
+let serviceServerIp;
+
 class Weather {
+
+    static setServiceServerIp(ip) {
+        serviceServerIp = 'http://'+ip;
+    }
+
     constructor() {
         this.geoCode = new GeoCode();
         this.lang = 'en';
@@ -33,9 +40,27 @@ class Weather {
         });
     };
 
-    _geoinfo2url(geoInfo) {
-        console.info({geoInfo: geoInfo});
-        let url = this.url + '/' + this.version;
+    _requests(urls, callback) {
+        let requestResult;
+        async.someSeries(urls, (url, callback) => {
+            this._request(url, function (err, result) {
+                if (err) {
+                    return callback(null, !err);
+                }
+                requestResult = result;
+                callback(null, !err);
+            });
+        }, (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+            console.log({requests: {result: result}});
+            callback(null, requestResult);
+        });
+    };
+
+    _geoinfo2url(server, version, geoInfo) {
+        let url = server + '/' + version;
         if (geoInfo.country === 'KR') {
             url += '/kma/addr';
             if (geoInfo.kmaAddress.name1 && geoInfo.kmaAddress.name1.length > 0)  {
@@ -56,10 +81,10 @@ class Weather {
         }
     }
 
-    _appendQueryParameters(event, url) {
+    _appendQueryParameters(url, event) {
         let querys;
         let count = 0;
-        if (!event.hasOwnProperty('queryStringParameters')) {
+        if (!event || !event.hasOwnProperty('queryStringParameters')) {
             return url;
         }
         querys = event.queryStringParameters;
@@ -88,6 +113,21 @@ class Weather {
         }
     }
 
+    _makeUrls(geoInfo, event) {
+        let urls =[];
+        let domainUrl;
+        let ipUrl;
+        if (serviceServerIp) {
+            ipUrl = this._geoinfo2url(serviceServerIp, this.version, geoInfo);
+            ipUrl = this._appendQueryParameters(ipUrl, event);
+            urls.push(ipUrl);
+        }
+        domainUrl = this._geoinfo2url(this.url, this.version, geoInfo);
+        domainUrl = this._appendQueryParameters(domainUrl, event);
+        urls.push(domainUrl);
+        return urls;
+    }
+
     byCoord(event, callback) {
         try{
             this.lang = this._getLanguage(event);
@@ -103,15 +143,19 @@ class Weather {
                 });
             },
             (geoInfo, callback) => {
-                let url;
+                let urls;
                 try {
-                    url = this._geoinfo2url(geoInfo);
-                    url = this._appendQueryParameters(event, url);
+                   console.info({geoInfo: geoInfo});
+                   urls = this._makeUrls(geoInfo, event) ;
+                   if (!urls) {
+                       throw new Error("Fail to make urls");
+                   }
                 }
                 catch (err) {
                     return callback(err);
                 }
-                this._request(url, (err, result)=> {
+
+                this._requests(urls, (err, result)=> {
                     if (err) {
                         return callback(err);
                     }
