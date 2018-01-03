@@ -4,8 +4,26 @@
 
 'use strict';
 
+const config = require('./config');
 const GeoInfo = require('./function.geoinfo');
 const Weather = require('./function.weather');
+
+var dns = require('dns'),
+    dnscache = require('dnscache')({
+        "enable" : true,
+        "ttl" : 300,
+        "cachesize" : 1000
+    });
+
+var domain = config.serviceServer.url.replace('http://', '').replace('https://', '');
+dnscache.lookup(domain, function(err, result) {
+    if (err) {
+        console.error(err);
+    }
+    else {
+        console.info('cached domain:', domain, ' result:', result);
+    }
+});
 
 function makeResponse(err, result, cacheTime) {
     if (err) {
