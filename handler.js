@@ -22,6 +22,7 @@ dnscache.lookup(domain, function(err, result) {
     }
     else {
         console.info('cached domain:', domain, ' result:', result);
+        Weather.setServiceServerIp(result);
     }
 });
 
