@@ -17,6 +17,9 @@ function makeResponse(err, result, cacheTime) {
                 console.warn({Warning: err.message, statusCode: err.statusCode});
             }
         }
+        else {
+            console.error(err);
+        }
 
         return {
             statusCode: err.statusCode || 501,
