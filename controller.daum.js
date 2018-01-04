@@ -44,12 +44,13 @@ class ControllerDaum extends ControllerExternalApi {
             }
             geoInfo.kmaAddress = {"name1": result.name1, "name2": name2, "name3": result.name3};
         }
-        else if (result.name0 === "일본") {
-            geoInfo.country = "JP";
-        }
-        else {
-            throw new Error("It is not korea");
-        }
+        //일본 뿐만 아니라, 남해인경우에도 일본지역인 경우가 있음. #2012
+        // else if (result.name0 === "일본") {
+        //     geoInfo.country = "JP";
+        // }
+        // else {
+        //     throw new Error("It is not korea");
+        // }
 
         geoInfo.loc = loc;
         geoInfo.lang = lang;
