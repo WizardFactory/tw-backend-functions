@@ -74,6 +74,10 @@ class GeoInfo {
     }
 
     importGeoInfo(dest, source) {
+        if (dest == undefined) {
+            throw new Error("dest is undefined");
+        }
+
         ['label', 'country', 'address', 'loc'].forEach((propertyName) => {
             if (source.hasOwnProperty(propertyName)) {
                 if (propertyName === 'label') {

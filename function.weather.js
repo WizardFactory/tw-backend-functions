@@ -45,6 +45,7 @@ class Weather {
         async.someSeries(urls, (url, callback) => {
             this._request(url, function (err, result) {
                 if (err) {
+                    console.warn(err.message, url);
                     return callback(null, !err);
                 }
                 requestResult = result;
@@ -54,8 +55,10 @@ class Weather {
             if (err) {
                 return callback(err);
             }
-            console.log({requests: {result: result}});
-            callback(null, requestResult);
+            if (result === false) {
+                err =  new Error("Fail to get weather data");
+            }
+            callback(err, requestResult);
         });
     };
 
@@ -128,7 +131,15 @@ class Weather {
         return urls;
     }
 
-    byCoord(event, callback) {
+    _coord2geoInfo (event, callback) {
+        this.geoCode.coord2geoInfo(event, callback);
+    }
+
+    _importGeoInfo (dest, src) {
+        this.geoCode.importGeoInfo(dest, src);
+    }
+
+    byCoord (event, callback) {
         try{
             this.lang = this._getLanguage(event);
         }
@@ -138,7 +149,7 @@ class Weather {
 
         async.waterfall([
             (callback) => {
-                this.geoCode.coord2geoInfo(event, (err, result) => {
+                this._coord2geoInfo(event, (err, result) => {
                     callback(err, result);
                 });
             },
@@ -160,7 +171,7 @@ class Weather {
                         return callback(err);
                     }
                     try {
-                        this.geoCode.importGeoInfo(result, geoInfo);
+                        this._importGeoInfo(result, geoInfo);
                     }
                     catch (err) {
                         return callback(err);

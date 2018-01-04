@@ -28,6 +28,28 @@ describe('test function weather', () => {
         expect(urls.length).to.equal(2);
         expect(urls[0].indexOf(ip)).to.not.equal(-1);
     });
+
+    it('test fail to get request', (done) => {
+        let weather = new Weather();
+        weather._request = function (url, callback ) {
+            callback(new Error("Fail to request"));
+        };
+
+        weather._coord2geoInfo = function (event, callback) {
+            callback(null, { updatedAt: 1514627593387,
+                label: '鶴賀',
+                address: '日本、〒381-0000 長野県長野市鶴賀',
+                id: '36.65,138.19,ja',
+                country: 'JP',
+                loc: [ 36.65, 138.19 ],
+                lang: 'ja' });
+        };
+
+        weather.byCoord({}, function (err) {
+            expect(err).to.not.null;
+            done();
+        });
+    });
 });
 
 
