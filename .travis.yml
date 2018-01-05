@@ -11,9 +11,8 @@ before_deploy:
   - git commit -m "update release-config.js"
 
 deploy:
-  provider: script
-  script:
-    - sls deploy -v
-    - npm run e2etest
-  on:
-    branch: master
+  - provider: script
+    script:
+      - sls deploy
+    on:
+      branch: master
