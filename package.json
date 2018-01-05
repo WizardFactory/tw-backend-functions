@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha ./test",
     "offline": "sls offline start",
-    "e2etest": "",
+    "e2etest": "mocha ./test/e2e",
     "deploy": "sls deploy -v",
     "deploy-geoinfobycoord": "sls deploy -f geoinfobycoord -v",
     "deploy-pro": "sls deploy -s production -v"
