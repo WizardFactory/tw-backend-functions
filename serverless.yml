@@ -86,9 +86,9 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-package:
-  include:
-    - node_modules/**
+#package:
+#  include:
+#    - include-me.js
 #    - include-me-dir/**
 #  exclude:
 #    - exclude-me.js
