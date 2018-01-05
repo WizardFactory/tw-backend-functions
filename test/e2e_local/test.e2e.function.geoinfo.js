@@ -15,11 +15,14 @@ let event = {
 };
 
 describe('test function geo info', () => {
-    it('test addr 2 geo info', (done) => {
+    it('test addr 2 geo info', function (done) {
+        this.timeout(10*1000);
+
         let geoInfo = new FunctionGeoInfo();
         geoInfo.addr2geoInfo(event, function (err, geoInfo) {
             if (err) {
                 console.error(err);
+                done();
                 return;
             }
             expect(geoInfo.loc[0]).to.equal(37.506);
