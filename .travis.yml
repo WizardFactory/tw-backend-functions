@@ -14,5 +14,6 @@ deploy:
   - provider: script
     script:
       - sls deploy
+      - npm run e2etest
     on:
       branch: master
