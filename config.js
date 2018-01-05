@@ -11,5 +11,8 @@ module.exports = {
     serviceServer: {
         url: (process.env.SERVICE_SERVER || 'http://localhost'),
         version:  (process.env.SERVICE_VERSION || 'v000901')
+    },
+    apiServer: {
+        url: (process.env.API_SERVER || 'http://localhost')
     }
 };
