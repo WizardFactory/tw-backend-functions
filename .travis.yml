@@ -10,10 +10,12 @@ before_deploy:
   - git add config.js
   - git commit -m "update release-config.js"
 
+after_deploy:
+  - npm run e2etest
+
 deploy:
   - provider: script
     script:
       - sls deploy
-      - npm run e2etest
     on:
       branch: master
