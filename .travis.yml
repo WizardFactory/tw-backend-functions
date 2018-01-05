@@ -13,7 +13,7 @@ before_deploy:
 deploy:
   provider: script
   script:
-    - npm run deploy
+    - sls deploy -v
     - npm run e2etest
   on:
     branch: master
