@@ -12,6 +12,8 @@ before_deploy:
 
 deploy:
   provider: script
-  script: npm run deploy;npm run e2etest
+  script:
+    - npm run deploy
+    - npm run e2etest
   on:
     branch: master
