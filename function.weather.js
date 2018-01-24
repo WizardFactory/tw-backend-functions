@@ -120,12 +120,14 @@ class Weather {
         let urls =[];
         let domainUrl;
         let ipUrl;
+        let version = event.pathParameters.version || this.version;
+
         if (serviceServerIp) {
-            ipUrl = this._geoinfo2url(serviceServerIp, this.version, geoInfo);
+            ipUrl = this._geoinfo2url(serviceServerIp, version, geoInfo);
             ipUrl = this._appendQueryParameters(ipUrl, event);
             urls.push(ipUrl);
         }
-        domainUrl = this._geoinfo2url(this.url, this.version, geoInfo);
+        domainUrl = this._geoinfo2url(this.url, version, geoInfo);
         domainUrl = this._appendQueryParameters(domainUrl, event);
         urls.push(domainUrl);
         return urls;

@@ -13,9 +13,9 @@
 
 service: tw-backend-functions
 
-#plugins:
-#  - serverless-dynamodb-local
-#  - serverless-offline
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
 
 custom:
   dynamoGeoCodeDBTableName: "${opt:stage, self:provider.stage}-geocode"
@@ -116,6 +116,10 @@ functions:
     events:
       - http:
           path: weather/coord/{loc}
+          method: get
+          cors: true
+      - http:
+          path: weather/{version}/coord/{loc}
           method: get
           cors: true
 
