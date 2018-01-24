@@ -118,6 +118,10 @@ functions:
           path: weather/coord/{loc}
           method: get
           cors: true
+      - http:
+          path: weather/{version}/coord/{loc}
+          method: get
+          cors: true
 
   weatherbyaddr:
     handler: handler.weatherbyaddr
