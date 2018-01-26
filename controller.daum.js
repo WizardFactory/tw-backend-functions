@@ -105,7 +105,7 @@ class ControllerDaum extends ControllerExternalApi {
             throw new Error("Fail to find query="+addr);
         }
         if (result.channel.totalCount > 1) {
-            throw new Error("too many result of query="+addr);
+            console.warn("too many result of query="+addr);
         }
 
         let item = result.channel.item[0];
