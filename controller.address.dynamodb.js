@@ -58,12 +58,10 @@ class ControllerAddressDynamdb extends ControllerDynamodb {
             return this;
         }
 
-        let updateExpression = 'SET loc = :loc, country = :country, address = :address' +
-            ', updatedAt = :updatedAt';
+        let updateExpression = 'SET loc = :loc, address = :address, updatedAt = :updatedAt';
 
         let expressionAttributeValues = {
             ':loc': geoInfo.loc,
-            ':country': geoInfo.country,
             ':address': geoInfo.address,
             ':updatedAt': timestamp
         };
@@ -71,6 +69,10 @@ class ControllerAddressDynamdb extends ControllerDynamodb {
         if (geoInfo.kmaAddress) {
             updateExpression += ', kmaAddress = :kmaAddress';
             expressionAttributeValues[':kmaAddress'] = geoInfo.kmaAddress;
+        }
+        if (geoInfo.country) {
+            updateExpression += ', country = :country';
+            expressionAttributeValues[':country'] = geoInfo.country;
         }
 
         const params = {
