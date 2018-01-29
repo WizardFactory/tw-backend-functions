@@ -110,6 +110,10 @@ functions:
           path: geocode/addr/{address}
           method: get
           cors: true
+      - http:
+          path: geocode/{version}/addr/{address}
+          method: get
+          cors: true
 
   weatherbycoord:
     handler: handler.weatherbycoord
