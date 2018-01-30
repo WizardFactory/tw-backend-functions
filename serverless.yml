@@ -102,6 +102,10 @@ functions:
           path: geocode/coord/{loc}
           method: get
           cors: true
+      - http:
+          path: geocode/{version}/coord/{loc}
+          method: get
+          cors: true
 
   geoinfobyaddr:
     handler: handler.geoinfobyaddr
@@ -132,6 +136,10 @@ functions:
     events:
       - http:
           path: weather/addr/{address}
+          method: get
+          cors: true
+      - http:
+          path: weather/{version}/addr/{address}
           method: get
           cors: true
 
