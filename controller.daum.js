@@ -42,7 +42,13 @@ class ControllerDaum extends ControllerExternalApi {
             if (name2) {
                 name2 = name2.replace(/ /g,"");
             }
-            geoInfo.kmaAddress = {"name1": result.name1, "name2": name2, "name3": result.name3};
+            geoInfo.kmaAddress = {"name1": result.name1};
+            if (name2 && name2.length > 0) {
+                geoInfo.kmaAddress.name2 = name2;
+            }
+            if (result.name3 && result.name3.length > 0) {
+                geoInfo.kmaAddress.name3 = result.name3;
+            }
         }
         //일본 뿐만 아니라, 남해인경우에도 일본지역인 경우가 있음. #2012
         // else if (result.name0 === "일본") {
