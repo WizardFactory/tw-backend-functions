@@ -34,7 +34,7 @@ class GeoApi {
             callback(err, result);
         });
         return this;
-    };
+    }
 
     _getGeoInfoFromGoogleGeoCode(loc, lang, callback) {
         //console.log({_getGeoInfoFromGoogleGeoCode: {loc: loc, lang: lang}});
@@ -43,7 +43,7 @@ class GeoApi {
             callback(err, result);
         });
         return this;
-    };
+    }
 
     _getGeoInfoFromDarksky(loc, lang, callback) {
         //console.log({_getGeoInfoFromDarksky: {loc: loc, lang: lang}});
@@ -51,7 +51,7 @@ class GeoApi {
         ctrl.byGeoCode(loc, lang, (err, result) => {
             callback(err, result);
         });
-    };
+    }
 
     getGeoInfoByCoord(loc, lang, callback)  {
 
