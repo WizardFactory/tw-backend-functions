@@ -40,20 +40,19 @@ class GeoInfo {
         });
     }
 
-    _renewGeoCodeData(geoInfo) {
+    _isExpired(geoInfo) {
         const timestamp = new Date().getTime();
         const MONTH = 2592000000; //1000*60*60*24*30
 
         if (!geoInfo.updatedAt) {
             console.error("geoInfo updatedAt is invalid");
-            return;
+            return true;
         }
 
         if (geoInfo.updatedAt < timestamp - MONTH) {
-            this._updateGeoCodeDb(geoInfo, (err)=> {
-                if (err) { console.error(err);}
-            });
+            return true;
         }
+        return false;
     }
 
     _getLanguage(event) {
@@ -93,6 +92,12 @@ class GeoInfo {
         });
     }
 
+    /**
+     * lambda는 응답을 전달해주면 instance가 종료되기 때문에, background processing(renewal db)을 하면 안됨.
+     * @param event
+     * @param callback
+     * @returns {*}
+     */
     coord2geoInfo(event, callback) {
         let loc;
         let lang;
@@ -119,7 +124,11 @@ class GeoInfo {
                         if (err) {
                             return cb(err);
                         }
-                        this._renewGeoCodeData(geoInfo);
+                        if (this._isExpired(geoInfo)) {
+                            err = new Error("this data is expired geoInfo:"+JSON.stringify(geoInfo));
+                            console.warn(err.message);
+                            return cb(err);
+                        }
                         cb(err, geoInfo);
                     });
                 },
