@@ -7,6 +7,7 @@
 const async = require('async');
 const ControllerDaum = require('./controller.daum');
 const ControllerGoogle = require('./controller.google');
+const ControllerDarksky = require('./controller.darksky');
 
 class GeoApi {
     constructor() {
@@ -33,7 +34,7 @@ class GeoApi {
             callback(err, result);
         });
         return this;
-    };
+    }
 
     _getGeoInfoFromGoogleGeoCode(loc, lang, callback) {
         //console.log({_getGeoInfoFromGoogleGeoCode: {loc: loc, lang: lang}});
@@ -42,7 +43,15 @@ class GeoApi {
             callback(err, result);
         });
         return this;
-    };
+    }
+
+    _getGeoInfoFromDarksky(loc, lang, callback) {
+        //console.log({_getGeoInfoFromDarksky: {loc: loc, lang: lang}});
+        let ctrl = new ControllerDarksky();
+        ctrl.byGeoCode(loc, lang, (err, result) => {
+            callback(err, result);
+        });
+    }
 
     getGeoInfoByCoord(loc, lang, callback)  {
 
@@ -75,7 +84,8 @@ class GeoApi {
                     else {
                         this._getGeoInfoFromGoogleGeoCode(loc, lang, (err, geoInfo) => {
                             if (err) {
-                                return callback(err);
+                                console.warn(JSON.stringify({'resultGetGoogleGeoCode':err.message}));
+                                return callback(null, geoInfo);
                             }
                             callback(err, geoInfo);
                         });
@@ -83,17 +93,48 @@ class GeoApi {
                 },
                 (geoInfo, callback) => {
                     //get address from google for jp in IsKoreaArea
-                    if (geoInfo.address && geoInfo.label) {
+                    if (geoInfo && geoInfo.address && geoInfo.label) {
+                        return callback(null, geoInfo);
+                    }
+
+                    if (isKoreaArea !== true && geoInfo == undefined) {
+                        //fail to get geoinfo from google
                         return callback(null, geoInfo);
                     }
 
                     this._getGeoInfoFromGoogleGeoCode(loc, lang, (err, newGeoInfo) => {
                         if (err) {
-                            return callback(err);
+                            console.warn(err);
+                            return callback(null, geoInfo);
                         }
                         try {
                             for(let key in newGeoInfo) {
                                 geoInfo[key] = geoInfo[key]?geoInfo[key]:newGeoInfo[key];
+                            }
+                        }
+                        catch(err) {
+                            return callback(err);
+                        }
+                        callback(err, geoInfo);
+                    });
+                },
+                (geoInfo, callback) => {
+                    if (geoInfo && geoInfo.address && geoInfo.label) {
+                        return callback(null, geoInfo);
+                    }
+
+                    this._getGeoInfoFromDarksky(loc, lang, (err, newGeoInfo) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        try {
+                            if (geoInfo == undefined) {
+                                geoInfo = newGeoInfo;
+                            }
+                            else {
+                                for(let key in newGeoInfo) {
+                                    geoInfo[key] = geoInfo[key]?geoInfo[key]:newGeoInfo[key];
+                                }
                             }
                         }
                         catch(err) {

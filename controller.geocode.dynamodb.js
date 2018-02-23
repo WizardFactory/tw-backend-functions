@@ -64,22 +64,23 @@ class ControllerGeoCodeDynamdb extends ControllerDynamodb {
             return this;
         }
 
-        let updateExpression = 'SET loc = :loc, lang = :lang, country = :country, address = :address' +
-            ', label = :label, updatedAt = :updatedAt';
+        let updateExpression = 'SET loc = :loc, lang = :lang' +
+            ', label = :label, updatedAt = :updatedAt, provider = :provider';
 
         let expressionAttributeValues = {
             ':loc': geoInfo.loc,
             ':lang': geoInfo.lang,
-            ':country': geoInfo.country,
-            ':address': geoInfo.address,
             ':label': geoInfo.label,
-            ':updatedAt': timestamp
+            ':updatedAt': timestamp,
+            ':provider': geoInfo.provider
         };
 
-        if (geoInfo.kmaAddress) {
-            updateExpression += ', kmaAddress = :kmaAddress';
-            expressionAttributeValues[':kmaAddress'] = geoInfo.kmaAddress;
-        }
+        ['country', 'address', 'kmaAddress'].forEach(function (name) {
+            if (geoInfo[name]) {
+                updateExpression += ', '+name+' = :'+name;
+                expressionAttributeValues[':'+name] = geoInfo[name];
+            }
+        });
 
         const params = {
             TableName: process.env.DYNAMODB_GEOCODE_TABLE,

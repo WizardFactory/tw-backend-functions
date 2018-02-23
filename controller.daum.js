@@ -60,6 +60,7 @@ class ControllerDaum extends ControllerExternalApi {
 
         geoInfo.loc = loc;
         geoInfo.lang = lang;
+        geoInfo.provider = 'daum';
 
         return geoInfo;
     }

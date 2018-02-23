@@ -206,6 +206,7 @@ class ControllerGoogle extends ControllerExternalApi {
 
         geoInfo.loc = loc;
         geoInfo.lang = lang;
+        geoInfo.provider = 'google';
 
         return geoInfo;
     }
