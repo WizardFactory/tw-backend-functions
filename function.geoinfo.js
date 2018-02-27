@@ -160,6 +160,9 @@ class GeoInfo {
             let geoInfoForClient = {};
             try {
                 this.importGeoInfo(geoInfoForClient, geoInfo);
+                if (geoInfo.kmaAddress) {
+                    geoInfoForClient.kmaAddress = geoInfo.kmaAddress;
+                }
             }
             catch(err) {
                 return callback(err);
