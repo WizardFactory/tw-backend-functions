@@ -5,6 +5,7 @@
 'use strict';
 
 const ControllerDynamodb = require('./controller.dynamodb');
+const async = require('async');
 
 class ControllerGeoCodeDynamdb extends ControllerDynamodb {
     constructor() {
@@ -32,15 +33,31 @@ class ControllerGeoCodeDynamdb extends ControllerDynamodb {
             callback(err);
         }
 
-        this._getDb(params, (err, result) => {
-            if (err) {
-                return callback(err);
-            }
-            if (!result || !result.Item) {
-                err = new Error("Fail to find item params : "+params);
-            }
-            callback(err, result.Item);
-        });
+        console.info(JSON.stringify({getDb:{params: params}}));
+
+        async.retry(2,
+            (callback)=>{
+                this._getDbTimeout(params, 1000, (err, result)=> {
+                    if (err) {
+                        if (err.code === 'ETIMEDOUT') {
+                            console.error(err);
+                        }
+                        else {
+                            console.warn(err.message);
+                        }
+                    }
+                    callback(err, result);
+                })
+            },
+            (err, result)=> {
+                if (err) {
+                    return callback(err);
+                }
+                if (!result || !result.Item) {
+                    err = new Error("Fail to find item params : "+params);
+                }
+                callback(err, result.Item);
+            });
 
         return this;
     }
