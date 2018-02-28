@@ -5,6 +5,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const async = require('async');
 
 let options = {};
 
@@ -23,13 +24,18 @@ class ControllerDynamdb {
     }
 
     _getDb(params, callback) {
-        console.info(JSON.stringify({_getDb:{params: params}}));
+        // console.info(JSON.stringify({_getDb:{params: params}}));
         dynamoDb.get(params, (err, result) => {
             if (err) {
                 return callback(err);
             }
             callback(err, result);
         });
+    }
+
+    _getDbTimeout(params, timeout, callback) {
+        let wrapped = async.timeout(this._getDb, timeout);
+        wrapped(params, callback);
     }
 
     _updateDb(params, callback) {
