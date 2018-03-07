@@ -124,6 +124,11 @@ class GeoInfo {
                         if (err) {
                             return cb(err);
                         }
+                        if (geoInfo.country === 'KR' && geoInfo.kmaAddress == undefined) {
+                            err = new Error("this data is invalid geoInfo:"+JSON.stringify(geoInfo));
+                            console.error(err);
+                            return cb(err);
+                        }
                         if (this._isExpired(geoInfo)) {
                             err = new Error("this data is expired geoInfo:"+JSON.stringify(geoInfo));
                             console.warn(err.message);
