@@ -43,11 +43,13 @@ class Weather {
     _requests(urls, callback) {
         let requestResult;
         async.someSeries(urls, (url, callback) => {
+            let startTime = new Date();
             this._request(url, function (err, result) {
                 if (err) {
                     console.warn(err.message, url);
                     return callback(null, !err);
                 }
+                console.info({twServiceResponseTime: new Date().getTime() - startTime.getTime()});
                 requestResult = result;
                 callback(null, !err);
             });

@@ -37,6 +37,7 @@ class ControllerGeoCodeDynamdb extends ControllerDynamodb {
 
         async.retry(2,
             (callback)=>{
+                let startTime = new Date();
                 this._getDbTimeout(params, 1000, (err, result)=> {
                     if (err) {
                         if (err.code === 'ETIMEDOUT') {
@@ -45,6 +46,9 @@ class ControllerGeoCodeDynamdb extends ControllerDynamodb {
                         else {
                             console.warn(err.message);
                         }
+                    }
+                    else {
+                        console.info({dynamoResponseTime: new Date().getTime() - startTime.getTime()});
                     }
                     callback(err, result);
                 })
