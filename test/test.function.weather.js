@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const Weather = require('../function.weather');
+const Weather = require('../weather/function.weather');
 
 describe('test function weather', () => {
     let ip = "12.12.12.32";

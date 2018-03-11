@@ -4,10 +4,6 @@
 
 'use strict';
 
-const config = require('./config');
-const GeoInfo = require('./function.geoinfo');
-const Weather = require('./function.weather');
-
 var dns = require('dns'),
     dnscache = require('dnscache')({
         "enable" : true,
@@ -15,16 +11,7 @@ var dns = require('dns'),
         "cachesize" : 1000
     });
 
-var domain = config.serviceServer.url.replace('http://', '').replace('https://', '');
-dnscache.lookup(domain, function(err, result) {
-    if (err) {
-        console.error(err);
-    }
-    else {
-        console.info('cached domain:', domain, ' result:', result);
-        Weather.setServiceServerIp(result);
-    }
-});
+const GeoInfo = require('./function.geoinfo');
 
 function makeResponse(err, result, cacheTime) {
     if (err) {
@@ -81,30 +68,3 @@ module.exports.geoinfobyaddr = (event, context, callback) => {
         callback(null, response);
     });
 };
-
-module.exports.weatherbycoord = (event, context, callback) => {
-    new Weather().byCoord(event, (err, result) => {
-        let response;
-        try {
-            response = makeResponse(err, result, 300); //5mins
-        }
-        catch (err) {
-            return callback(err);
-        }
-        callback(null, response);
-    });
-};
-
-module.exports.weatherbyaddr = (event, context, callback) => {
-    new Weather().byAddress(event, (err, result) => {
-        let response;
-        try {
-            response = makeResponse(err, result, 300); //5mins
-        }
-        catch (err) {
-            return callback(err);
-        }
-        callback(null, response);
-    });
-};
-

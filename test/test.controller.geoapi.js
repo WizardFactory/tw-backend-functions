@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const ControllerGeoApi = require('../controller.geoapi');
+const ControllerGeoApi = require('../geoinfo/controller.geoapi');
 
 const tokyoLocation = [35.689, 139.691];
 const seoulLocation = [37.506, 127.084];

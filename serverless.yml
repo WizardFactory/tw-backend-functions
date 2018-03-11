@@ -16,6 +16,7 @@ service: tw-backend-functions
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-webpack
 
 custom:
   dynamoGeoCodeDBTableName: "${opt:stage, self:provider.stage}-geocode"
@@ -27,6 +28,11 @@ custom:
       migrate: true
     migration:
       dir: offline/migrations
+  enabled:
+    dev: false
+    production: true
+  webpack:
+    includeModules: true
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -62,6 +68,10 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.dynamoAddressDBTableName}"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "*"
 
 # you can overwrite defaults here
 
@@ -86,7 +96,8 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
+package:
+  individually: true
 #  include:
 #    - include-me.js
 #    - include-me-dir/**
@@ -96,7 +107,7 @@ provider:
 
 functions:
   geoinfobycoord:
-    handler: handler.geoinfobycoord
+    handler: geoinfo/handler.geoinfobycoord
     events:
       - http:
           path: geocode/coord/{loc}
@@ -108,7 +119,7 @@ functions:
           cors: true
 
   geoinfobyaddr:
-    handler: handler.geoinfobyaddr
+    handler: geoinfo/handler.geoinfobyaddr
     events:
       - http:
           path: geocode/addr/{address}
@@ -120,7 +131,7 @@ functions:
           cors: true
 
   weatherbycoord:
-    handler: handler.weatherbycoord
+    handler: weather/handler.weatherbycoord
     events:
       - http:
           path: weather/coord/{loc}
@@ -132,7 +143,7 @@ functions:
           cors: true
 
   weatherbyaddr:
-    handler: handler.weatherbyaddr
+    handler: weather/handler.weatherbyaddr
     events:
       - http:
           path: weather/addr/{address}
@@ -142,6 +153,13 @@ functions:
           path: weather/{version}/addr/{address}
           method: get
           cors: true
+
+  copyKaqfsImagesToS3:
+    handler: kaqfs/handler.copyKaqfsImagesToS3
+    events:
+      - schedule:
+        rate: cron(5 5,15 * * ? *)
+        enabled: ${self:custom.enabled.${opt:stage, self:provider.stage}}
 
 resources:
   Resources:

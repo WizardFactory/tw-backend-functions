@@ -8,7 +8,7 @@ const async = require('async');
 
 const ControllerExternalApi = require('./controller.externalapi');
 
-const config = require('./config');
+const config = require('../config');
 
 class ControllerDarksky extends ControllerExternalApi {
     constructor() {
