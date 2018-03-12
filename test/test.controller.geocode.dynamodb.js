@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const ControllerGeoCodeDb = require('../controller.geocode.dynamodb');
+const ControllerGeoCodeDb = require('../geoinfo/controller.geocode.dynamodb');
 
 const updateResult = { Attributes:
         { country: 'KR',

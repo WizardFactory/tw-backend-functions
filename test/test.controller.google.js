@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const ControllerGoogle = require('../controller.google');
+const ControllerGoogle = require('../geoinfo/controller.google');
 
 const geoCodeBody ={
     "results" : [

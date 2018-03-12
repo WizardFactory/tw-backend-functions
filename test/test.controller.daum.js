@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const ControllerDaum = require('../controller.daum');
+const ControllerDaum = require('../geoinfo/controller.daum');
 
 const body = {"type":"H","code":"1124071","name":"잠실본동","fullName":"서울특별시 송파구 잠실본동","regionId":"I10171299","name0":"대한민국","code1":"11","name1":"서울특별시","code2":"11240","name2":"송파구","code3":"1124071","name3":"잠실본동","x":127.0843446217054,"y":37.506146070187526};
 

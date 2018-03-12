@@ -7,8 +7,8 @@
 const async = require('async');
 const request = require('request');
 
-const GeoCode = require('./function.geoinfo');
-const config = require('./config');
+const GeoCode = require('../geoinfo/function.geoinfo');
+const config = require('../config');
 
 let serviceServerIp;
 

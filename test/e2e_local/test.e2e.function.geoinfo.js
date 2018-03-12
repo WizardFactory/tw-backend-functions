@@ -6,7 +6,7 @@
 
 const expect = require('chai').expect;
 
-const FunctionGeoInfo = require('../../function.geoinfo');
+const FunctionGeoInfo = require('../../geoinfo/function.geoinfo');
 
 let event = {
     pathParameters: {
