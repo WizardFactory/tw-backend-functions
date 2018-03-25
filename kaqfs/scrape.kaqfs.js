@@ -12,10 +12,13 @@ const config = require('../config');
 
 class ScrapeKaqfs {
     constructor() {
-        this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE4';
+        //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE2';
+        //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE4';
+        //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE5';
+        this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg';
         this.jpegPostfix = '000.gif';
         this.animationPostfix = 'animation.gif';
-        this.areaList = ['09km', '03km', '27km'];
+        this.areaList = ['09KM', '03KM', '27KM'];
         this.pollutantList = ['PM10', 'PM2_5', 'O3', 'NO2', 'SO2'];
 
         let options = {
