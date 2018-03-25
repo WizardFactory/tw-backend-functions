@@ -53,5 +53,22 @@ describe('test function controller s3 ', () => {
                 done();
             });
     });
+
+    it('test copy object to new prefix', function(done) {
+        this.timeout(60 * 1000);
+
+        let ctrlS3  = new ControllerS3('ap-northeast-2', 'tw-kaqfs-images');
+        ctrlS3.copy('dateBackup/SO2.09km.animation.gif',
+            'tw-kaqfs-images/2018-03-10 09:00:00(KST)/SO2.09km.animation.gif')
+            .then(result => {
+                console.info(result);
+                done();
+            })
+            .catch(err => {
+                console.error(err);
+                expect(err).to.null;
+                done();
+            });
+    });
 });
 
