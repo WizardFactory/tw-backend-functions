@@ -24,6 +24,10 @@ class ScrapeKaqfs {
         };
 
         this.vision = new Vision.ImageAnnotatorClient(options);
+        this.region = config.image.kaq_korea_image.region;
+        this.bucket = config.image.kaq_korea_image.bucketName;
+        this.ctrlS3  = new ControllerS3(this.region, this.bucket);
+        this.backupFolder = 'dateBackup';
     }
 
     /**
@@ -81,21 +85,58 @@ class ScrapeKaqfs {
         return list;
     }
 
-    _uploadListToS3(list, callback) {
-        let ctrlS3  = new ControllerS3('ap-northeast-2', 'tw-kaqfs-images');
-        async.mapLimit(list, 3,
-            (obj, callback)=> {
-                ctrlS3.upload(obj.url, obj.s3Path)
-                    .then(result => {
-                        callback(null, result);
-                    })
-                    .catch(err => {
-                        callback(err);
-                    });
-            },
-            (err, results) => {
-                callback(err, results);
-            });
+    _uploadListToS3(list) {
+        return new Promise((resolve, reject) => {
+            async.mapLimit(list, 3,
+                (obj, callback) => {
+                    this.ctrlS3.upload(obj.url, obj.s3Path)
+                        .then(result => {
+                            callback(null, result);
+                        })
+                        .catch(err => {
+                            callback(err);
+                        });
+                },
+                (err, results) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve(results);
+                });
+        });
+    }
+
+    /**
+     *
+     * @param [{Location: String, Bucket: String, Key: String, ETag: String}], list
+     * @param prefix
+     * @returns {Promise<any>}
+     * @private
+     */
+    _copyS3ListToDest(list, prefix) {
+        return new Promise((resolve, reject) => {
+            async.mapLimit(list, 3,
+                (obj, callback) => {
+                    //2018-03-24 09:00:00(KST)/PM2_5.09km.animation.gif
+                    let strArray = obj.Key.split('/');
+                    let src = this.bucket+'/' + obj.Key;
+                    let dest = prefix+strArray[1]+'_'+new Date().toISOString()+'_'+strArray[0];
+                    console.info({dest:dest, src: src});
+                    this.ctrlS3.copy(dest, src)
+                        .then(result => {
+                            callback(null, result);
+                        })
+                        .catch(err => {
+                            callback(err);
+                        });
+                },
+                (err, result) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve(result);
+                });
+        });
     }
 
     copyNewImagesToS3(callback) {
@@ -110,18 +151,29 @@ class ScrapeKaqfs {
                         });
                     })
                     .then(list => {
-                        this._uploadListToS3(list, callback);
+                        return this._uploadListToS3(list);
+                    })
+                    .then(s3list => {
+                        callback(null, s3list);
                     })
                     .catch(err => {
                         console.error(err);
                         callback(err);
                     });
             },
-            (err, result) => {
+            (err, s3list) => {
                 if(err) {
                     console.error(err);
+                    return callback(err)
                 }
-                callback(err, result);
+                let prefix = this.backupFolder + '/';
+                this._copyS3ListToDest(s3list, prefix)
+                    .then(result => {
+                        callback(null, result);
+                    })
+                    .catch(err => {
+                        callback(err);
+                    });
             });
     }
 }
