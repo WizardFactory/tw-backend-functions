@@ -15,7 +15,8 @@ class ScrapeKaqfs {
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE2';
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE4';
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE5';
-        this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg';
+        this.imgPathUrl = 'http://www.webairwatch.com/kaq';
+        this.imgPathPrefixs = ['modelimg', 'modelimg_CASE2', 'modelimg_CASE4', 'modelimg_CASE5'];
         this.jpegPostfix = '000.gif';
         this.animationPostfix = 'animation.gif';
         this.areaList = ['09KM', '03KM', '27KM'];
@@ -65,7 +66,8 @@ class ScrapeKaqfs {
     }
 
     _getDateOfKaqfsImage() {
-        let url = this.imgPathPrefix + '/' +this.pollutantList[0] + '.'+ this.areaList[0] + '.' + this.jpegPostfix;
+        let url = this.imgPathUrl + '/'+ this.imgPathPrefixs[0] + '/' +this.pollutantList[0] + '.'+
+            this.areaList[0] + '.' + this.jpegPostfix;
         return this._textDetection(url)
             .then(results => {
                 const detections = results[0].textAnnotations;
@@ -81,8 +83,10 @@ class ScrapeKaqfs {
         let list = [];
         this.areaList.forEach(area => {
             this.pollutantList.forEach(pollutatnt=> {
-                let url = this.imgPathPrefix + '/' + pollutatnt + '.' + area + '.' + this.animationPostfix;
-                list.push({url:url, s3Path: pollutatnt + '.' + area + '.' + this.animationPostfix});
+                this.imgPathPrefixs.forEach(prefix => {
+                    let url = this.imgPathUrl + '/' + prefix + '/' + pollutatnt + '.' + area + '.' + this.animationPostfix;
+                    list.push({url:url, s3Path: prefix +'.'+ pollutatnt + '.' + area + '.' + this.animationPostfix});
+                });
             });
         });
         return list;
