@@ -65,8 +65,9 @@ class ScrapeKaqfs {
         return strDate;
     }
 
-    _getDateOfKaqfsImage() {
-        let url = this.imgPathUrl + '/'+ this.imgPathPrefixs[0] + '/' +this.pollutantList[0] + '.'+
+    _getDateOfKaqfsImage(imgPathPrefix) {
+        imgPathPrefix = imgPathPrefix || this.imgPathPrefixs[0];
+        let url = this.imgPathUrl + '/'+ imgPathPrefix + '/' +this.pollutantList[0] + '.'+
             this.areaList[0] + '.' + this.jpegPostfix;
         return this._textDetection(url)
             .then(results => {
@@ -79,14 +80,12 @@ class ScrapeKaqfs {
             })
     }
 
-    _getGifImageList() {
+    _getGifImageList(prefix) {
         let list = [];
         this.areaList.forEach(area => {
-            this.pollutantList.forEach(pollutatnt=> {
-                this.imgPathPrefixs.forEach(prefix => {
-                    let url = this.imgPathUrl + '/' + prefix + '/' + pollutatnt + '.' + area + '.' + this.animationPostfix;
-                    list.push({url:url, s3Path: prefix +'.'+ pollutatnt + '.' + area + '.' + this.animationPostfix});
-                });
+            this.pollutantList.forEach(pollutant=> {
+                let url = this.imgPathUrl + '/' + prefix + '/' + pollutant + '.' + area + '.' + this.animationPostfix;
+                list.push({url:url, s3Path: prefix +'.'+ pollutant + '.' + area + '.' + this.animationPostfix});
             });
         });
         return list;
@@ -146,12 +145,12 @@ class ScrapeKaqfs {
         });
     }
 
-    copyNewImagesToS3(callback) {
+    _copyNewImagesToS3EachModel(imgPathPrefix, callback) {
         async.retry(3,
             (callback)=> {
-                this._getDateOfKaqfsImage()
+                this._getDateOfKaqfsImage(imgPathPrefix)
                     .then(strDate=> {
-                        let imageUrlList = this._getGifImageList();
+                        let imageUrlList = this._getGifImageList(imgPathPrefix);
                         return imageUrlList.map(obj => {
                             obj.s3Path = strDate + '/' + obj.s3Path;
                             return obj;
@@ -170,7 +169,6 @@ class ScrapeKaqfs {
             },
             (err, s3list) => {
                 if(err) {
-                    console.error(err);
                     return callback(err)
                 }
                 let prefix = this.backupFolder + '/';
@@ -181,6 +179,20 @@ class ScrapeKaqfs {
                     .catch(err => {
                         callback(err);
                     });
+            });
+    }
+
+    copyNewImagesToS3(callback) {
+        async.mapSeries(this.imgPathPrefixs,
+            (imgPathPrefix, callback)=> {
+                this._copyNewImagesToS3EachModel(imgPathPrefix, callback);
+            },
+            (err, results)=> {
+                if (err) {
+                    console.error(err);
+                    return callback(err)
+                }
+                return callback(err, results);
             });
     }
 }

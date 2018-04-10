@@ -25,20 +25,20 @@ describe('test function scrape kaqfs ', () => {
             });
     });
 
-    // it('test copy new images to s3', function(done) {
-    //     this.timeout(60 * 1000);
-    //     let scrape = new ScrapeKaqfs();
-    //     scrape.copyNewImagesToS3((err, result) => {
-    //         expect(err).to.null;
-    //         if (err) {
-    //             console.error(err);
-    //         }
-    //         else {
-    //             console.info(result);
-    //         }
-    //         done();
-    //     });
-    // });
+    it('test copy new images to s3', function(done) {
+        this.timeout(60 * 1000);
+        let scrape = new ScrapeKaqfs();
+        scrape.copyNewImagesToS3((err, result) => {
+            expect(err).to.null;
+            if (err) {
+                console.error(err);
+            }
+            else {
+                console.info(JSON.stringify(result));
+            }
+            done();
+        });
+    });
 
 });
 
