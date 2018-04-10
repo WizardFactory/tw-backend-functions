@@ -118,6 +118,7 @@ functions:
 
   copyKaqfsImagesToS3:
     handler: kaqfs/handler.copyKaqfsImagesToS3
+    timeout: 60
     events:
       - schedule: cron(5 * ? * * *)
 #        enabled: ${self:custom.enabled.${opt:stage, self:provider.stage}}
