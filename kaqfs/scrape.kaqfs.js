@@ -16,10 +16,12 @@ class ScrapeKaqfs {
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE4';
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE5';
         this.imgPathUrl = 'http://www.webairwatch.com/kaq';
-        this.imgPathPrefixs = ['modelimg', 'modelimg_CASE2', 'modelimg_CASE4', 'modelimg_CASE5'];
+        // this.imgPathPrefixs = ['modelimg', 'modelimg_CASE2', 'modelimg_CASE4', 'modelimg_CASE5'];
+        this.imgPathPrefixs = ['modelimg', 'modelimg_CASE4'];
         this.jpegPostfix = '000.gif';
         this.animationPostfix = 'animation.gif';
-        this.areaList = ['09KM', '03KM', '27KM'];
+        // this.areaList = ['09KM', '03KM', '27KM'];
+        this.areaList = ['09KM'];
         this.pollutantList = ['PM10', 'PM2_5', 'O3', 'NO2', 'SO2'];
 
         let options = {
@@ -56,6 +58,7 @@ class ScrapeKaqfs {
         try {
             let aDesc = detections[0].description.split('\n');
             strDate = aDesc[aDesc.length-2];
+            strDate = strDate.slice(0, 19);
             console.info({date:strDate});
         }
         catch (err) {
@@ -65,14 +68,19 @@ class ScrapeKaqfs {
         return strDate;
     }
 
-    _getDateOfKaqfsImage(imgPathPrefix) {
+    _getDateOfKaqfsImage(imgPathPrefix, pollutant) {
         imgPathPrefix = imgPathPrefix || this.imgPathPrefixs[0];
-        let url = this.imgPathUrl + '/'+ imgPathPrefix + '/' +this.pollutantList[0] + '.'+
+        pollutant = pollutant ||  this.pollutantList[0];
+
+        let url = this.imgPathUrl + '/'+ imgPathPrefix + '/' + pollutant + '.'+
             this.areaList[0] + '.' + this.jpegPostfix;
         return this._textDetection(url)
             .then(results => {
                 const detections = results[0].textAnnotations;
                 //console.log({detections: detections});
+                if (results[0].error) {
+                    console.error(results[0].error);
+                }
                 return detections;
             })
             .then((detections)=> {
@@ -80,13 +88,21 @@ class ScrapeKaqfs {
             })
     }
 
-    _getGifImageList(prefix) {
+    _getGifImageList(prefix, pollutant) {
         let list = [];
         this.areaList.forEach(area => {
-            this.pollutantList.forEach(pollutant=> {
+            if (pollutant) {
                 let url = this.imgPathUrl + '/' + prefix + '/' + pollutant + '.' + area + '.' + this.animationPostfix;
                 list.push({url:url, s3Path: prefix +'.'+ pollutant + '.' + area + '.' + this.animationPostfix});
-            });
+                return;
+            }
+            else {
+                //make all pollutant list;
+                this.pollutantList.forEach(pollutant=> {
+                    let url = this.imgPathUrl + '/' + prefix + '/' + pollutant + '.' + area + '.' + this.animationPostfix;
+                    list.push({url:url, s3Path: prefix +'.'+ pollutant + '.' + area + '.' + this.animationPostfix});
+                });
+            }
         });
         return list;
     }
@@ -171,21 +187,59 @@ class ScrapeKaqfs {
                 if(err) {
                     return callback(err)
                 }
-                let prefix = this.backupFolder + '/';
-                this._copyS3ListToDest(s3list, prefix)
-                    .then(result => {
-                        callback(null, result);
+                callback(null, s3list);
+                // let prefix = this.backupFolder + '/';
+                // this._copyS3ListToDest(s3list, prefix)
+                //     .then(result => {
+                //         callback(null, result);
+                //     })
+                //     .catch(err => {
+                //         callback(err);
+                //     });
+            });
+    }
+
+    _copyNewImagesToS3EachArea(imgPathPrefix, pollutant, callback) {
+        async.retry(3,
+            (callback)=> {
+                this._getDateOfKaqfsImage(imgPathPrefix, pollutant)
+                    .then(strDate=> {
+                        let imageUrlList = this._getGifImageList(imgPathPrefix, pollutant);
+                        return imageUrlList.map(obj => {
+                            obj.s3Path = strDate + '/' + obj.s3Path;
+                            return obj;
+                        });
+                    })
+                    .then(list => {
+                        return this._uploadListToS3(list);
+                    })
+                    .then(s3list => {
+                        callback(null, s3list);
                     })
                     .catch(err => {
+                        console.error(err);
                         callback(err);
                     });
+            },
+            (err, s3list) => {
+                callback(err, s3list);
+            });
+    }
+
+    _copyNewImagesToS3EachPollutant(imgPathPrefix, callback) {
+        async.mapSeries(this.pollutantList,
+            (pollutant, callback) => {
+                this._copyNewImagesToS3EachArea(imgPathPrefix, pollutant, callback);
+            },
+            (err, results)=> {
+                callback(err, results);
             });
     }
 
     copyNewImagesToS3(callback) {
         async.mapSeries(this.imgPathPrefixs,
             (imgPathPrefix, callback)=> {
-                this._copyNewImagesToS3EachModel(imgPathPrefix, callback);
+                this._copyNewImagesToS3EachPollutant(imgPathPrefix, callback);
             },
             (err, results)=> {
                 if (err) {
