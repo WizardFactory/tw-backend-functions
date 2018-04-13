@@ -123,6 +123,12 @@ functions:
       - schedule: cron(5 8,9,10,20,21,22 ? * * *)
 #        enabled: ${self:custom.enabled.${opt:stage, self:provider.stage}}
 
+  requestAqicn:
+    handler: aqicn/handler.requestAqicn
+    timeout: 300
+#    events:
+#      - schedule: cron(1 * ? * * *)
+
 resources:
   Resources:
     GeoCodeTable:

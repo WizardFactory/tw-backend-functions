@@ -32,12 +32,59 @@ class ControllerS3 {
         return this.s3.listObjectsV2(opts).promise();
     }
 
+    lsAll(folderName, token, callback) {
+        let opts = {
+            MaxKeys: 2147483647, // Maximum allowed by S3 API
+            Delimiter: '/'
+        };
+
+        if (folderName && folderName.length > 0) {
+            opts.Prefix = folderName;
+        }
+
+        if(token) {
+            opts.ContinuationToken = token;
+        }
+
+        this.s3.listObjectsV2(opts, (err, data) => {
+            this.allKeys = this.allKeys.concat(data.Contents);
+            if(data.IsTruncated)
+                this.lsAll(folderName, data.NextContinuationToken, callback);
+            else
+                callback(null);
+        });
+    }
+
     get(key) {
         return this.s3.getObject({Key: key}).promise();
     }
 
     copy(key, source) {
         return this.s3.copyObject({CopySource: source, Key: key}).promise();
+    }
+
+    uploadData(body, s3Path) {
+        let key = s3Path;
+        console.info({s3Path: s3Path});
+
+        let self = this;
+
+        return new Promise((resolve, reject) => {
+            self.s3.putObject({
+                    // Bucket: process.env.S3_BUCKET,
+                    Key: key,
+                    ContentType: "application/json",
+                    ACL: 'public-read',
+                    Body: body
+                },
+                (e, data) => {
+                    if (e) {
+                        return reject(e);
+                    }
+
+                    resolve(data);
+                });
+        });
     }
 
     upload(url, s3Path) {
