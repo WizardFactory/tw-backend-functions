@@ -7,11 +7,11 @@
 const async = require('async');
 const Vision = require('@google-cloud/vision');
 
-const ControllerS3 = require('./controller.s3');
+const ControllerS3 = require('../aws/controller.s3');
 const config = require('../config');
 
 class ScrapeKaqfs {
-    constructor() {
+    constructor(bucket) {
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE2';
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE4';
         //this.imgPathPrefix = 'http://www.webairwatch.com/kaq/modelimg_CASE5';
@@ -29,10 +29,11 @@ class ScrapeKaqfs {
             credentials: config.gcsCredentials
         };
 
+        bucket = bucket || this.bucket;
         this.vision = new Vision.ImageAnnotatorClient(options);
         this.region = config.image.kaq_korea_image.region;
         this.bucket = config.image.kaq_korea_image.bucketName;
-        this.ctrlS3  = new ControllerS3(this.region, this.bucket);
+        this.ctrlS3  = new ControllerS3(this.region, bucket);
         this.backupFolder = 'dateBackup';
     }
 

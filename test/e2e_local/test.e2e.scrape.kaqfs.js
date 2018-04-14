@@ -27,7 +27,7 @@ describe('test function scrape kaqfs ', () => {
 
     it('test copy new images to s3', function(done) {
         this.timeout(60 * 1000);
-        let scrape = new ScrapeKaqfs();
+        let scrape = new ScrapeKaqfs('tw-kaqfs-images-dev');
         scrape.copyNewImagesToS3((err, result) => {
             expect(err).to.null;
             if (err) {
