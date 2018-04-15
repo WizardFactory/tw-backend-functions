@@ -29,11 +29,11 @@ class ScrapeKaqfs {
             credentials: config.gcsCredentials
         };
 
-        bucket = bucket || this.bucket;
-        this.vision = new Vision.ImageAnnotatorClient(options);
         this.region = config.image.kaq_korea_image.region;
-        this.bucket = config.image.kaq_korea_image.bucketName;
-        this.ctrlS3  = new ControllerS3(this.region, bucket);
+        this.bucket = bucket || config.image.kaq_korea_image.bucketName;
+
+        this.vision = new Vision.ImageAnnotatorClient(options);
+        this.ctrlS3  = new ControllerS3(this.region, this.bucket);
         this.backupFolder = 'dateBackup';
     }
 
