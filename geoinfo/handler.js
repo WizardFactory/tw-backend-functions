@@ -2,7 +2,12 @@
  * Created by dhkim2 on 2017-12-04.
  */
 
-'use strict';
+"use strict";
+
+if (!process.env.IS_OFFLINE) {
+    const AWSXRay = require('aws-xray-sdk-core');
+    AWSXRay.captureAWS(require('aws-sdk'));
+}
 
 var dns = require('dns'),
     dnscache = require('dnscache')({
