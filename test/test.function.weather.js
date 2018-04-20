@@ -21,13 +21,13 @@ describe('test function weather', () => {
         expect(urls[0].indexOf(ip)).to.equal(-1);
     });
 
-    it('test make ip and domain url', () => {
-        Weather.setServiceServerIp(ip);
-        let weather = new Weather();
-        let urls = weather._makeUrls(geoInfo);
-        expect(urls.length).to.equal(2);
-        expect(urls[0].indexOf(ip)).to.not.equal(-1);
-    });
+    // it('test make ip and domain url', () => {
+    //     Weather.setServiceServerIp(ip);
+    //     let weather = new Weather();
+    //     let urls = weather._makeUrls(geoInfo);
+    //     expect(urls.length).to.equal(2);
+    //     expect(urls[0].indexOf(ip)).to.not.equal(-1);
+    // });
 
     it('test fail to get request', (done) => {
         let weather = new Weather();
