@@ -27,7 +27,7 @@ provider:
   runtime: nodejs6.10
   stage: dev
   region: ap-northeast-2
-  memorySize: 512
+  memorySize: 1024
   timeout: 20
   environment:
     DYNAMODB_GEOCODE_TABLE: ${self:custom.dynamoGeoCodeDBTableName}

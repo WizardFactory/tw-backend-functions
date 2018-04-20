@@ -12,7 +12,7 @@ class ControllerExternalApi {
 
     _request(url, callback) {
         console.info({_request:{url:url}});
-        request(url, {json: true, timeout: 3000}, (err, response, body) => {
+        request(url, {json: true, timeout: 3000, gzip: true}, (err, response, body) => {
             if (err) {
                 return callback(err);
             }
