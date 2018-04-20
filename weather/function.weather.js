@@ -10,13 +10,13 @@ const request = require('request');
 const GeoCode = require('../geoinfo/function.geoinfo');
 const config = require('../config');
 
-let serviceServerIp;
+// let serviceServerIp;
 
 class Weather {
 
-    static setServiceServerIp(ip) {
-        serviceServerIp = 'http://'+ip;
-    }
+    // static setServiceServerIp(ip) {
+    //     serviceServerIp = 'http://'+ip;
+    // }
 
     constructor() {
         this.geoCode = new GeoCode();
@@ -39,6 +39,25 @@ class Weather {
             callback(err, body);
         });
     };
+
+    _requestRetry(url, callback) {
+        async.retry(3,
+            (callback)=> {
+                this._request(url, (err, result)=> {
+                    if (err) {
+                        console.warn(err.message, url);
+                        return callback(err);
+                    }
+                    callback(null, result);
+                });
+            },
+            (err, result)=> {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, result);
+            })
+    }
 
     _requests(urls, callback) {
         let requestResult;
@@ -131,11 +150,11 @@ class Weather {
             version = this.version;
         }
 
-        if (serviceServerIp) {
-            ipUrl = this._geoinfo2url(serviceServerIp, version, geoInfo);
-            ipUrl = this._appendQueryParameters(ipUrl, event);
-            urls.push(ipUrl);
-        }
+        // if (serviceServerIp) {
+        //     ipUrl = this._geoinfo2url(serviceServerIp, version, geoInfo);
+        //     ipUrl = this._appendQueryParameters(ipUrl, event);
+        //     urls.push(ipUrl);
+        // }
         domainUrl = this._geoinfo2url(this.url, version, geoInfo);
         domainUrl = this._appendQueryParameters(domainUrl, event);
         urls.push(domainUrl);
@@ -177,7 +196,8 @@ class Weather {
                     return callback(err);
                 }
 
-                this._requests(urls, (err, result)=> {
+                //this._requests(urls, (err, result)=> {
+                this._requestRetry(urls[0], (err, result)=> {
                     if (err) {
                         return callback(err);
                     }

@@ -20,16 +20,16 @@ let dns = require('dns'),
         "cachesize" : 1000
     });
 
-let domain = config.serviceServer.url.replace('http://', '').replace('https://', '');
-dnscache.lookup(domain, function(err, result) {
-    if (err) {
-        console.error(err);
-    }
-    else {
-        console.info('cached domain:', domain, ' result:', result);
-        Weather.setServiceServerIp(result);
-    }
-});
+// let domain = config.serviceServer.url.replace('http://', '').replace('https://', '');
+// dnscache.lookup(domain, function(err, result) {
+//     if (err) {
+//         console.error(err);
+//     }
+//     else {
+//         console.info('cached domain:', domain, ' result:', result);
+//         Weather.setServiceServerIp(result);
+//     }
+// });
 
 function makeResponse(err, result, cacheTime) {
     if (err) {
