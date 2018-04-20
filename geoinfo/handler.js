@@ -7,6 +7,7 @@
 if (!process.env.IS_OFFLINE) {
     const AWSXRay = require('aws-xray-sdk-core');
     AWSXRay.captureAWS(require('aws-sdk'));
+    AWSXRay.captureHTTPsGlobal(require('http'));
 }
 
 var dns = require('dns'),
