@@ -53,7 +53,7 @@ class RequestAqicn {
 
     _request(url, callback) {
         // console.info({_request:{url:url}});
-        let options = {json: true, timeout: 30000};
+        let options = {json: true, timeout: 30000, gzip: true};
         request(url, options, (err, response, body) => {
             if (err) {
                 return callback(err);

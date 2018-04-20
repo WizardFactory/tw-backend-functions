@@ -27,7 +27,7 @@ class Weather {
 
     _request(url, callback) {
         console.info({_request:{url:url}});
-        let options = {json: true, timeout: 3000, headers: {'Accept-Language' : this.lang}};
+        let options = {json: true, timeout: 3000, headers: {'Accept-Language' : this.lang}, gzip: true};
         request(url, options, (err, response, body) => {
             if (err) {
                 return callback(err);
@@ -41,6 +41,7 @@ class Weather {
     };
 
     _requestRetry(url, callback) {
+        let startTime = new Date();
         async.retry(3,
             (callback)=> {
                 this._request(url, (err, result)=> {
@@ -52,6 +53,7 @@ class Weather {
                 });
             },
             (err, result)=> {
+                console.info({twServiceResponseTime: new Date().getTime() - startTime.getTime()});
                 if (err) {
                     return callback(err);
                 }
