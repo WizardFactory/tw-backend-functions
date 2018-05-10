@@ -33,7 +33,7 @@ jobs:
             sudo apt-get -y -qq install python3.4-dev
             curl -O https://bootstrap.pypa.io/get-pip.py
             python3.4 get-pip.py --user
-            pip install awscli --upgrade --user
+            /home/circleci/.local/bin/pip install awscli --upgrade --user
             aws s3 cp s3://tw-config/config.js ./ --region ap-northeast-2
             sudo npm i -g serverless
             yarn install
