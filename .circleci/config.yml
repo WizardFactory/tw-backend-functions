@@ -26,7 +26,19 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn install
+      - run:
+          name: Install Serverless CLI and dependencies
+          command: |
+            sudo npm i -g serverless
+            yarn install
+
+      - run:
+          name: Deploy application
+          command: |
+            aws s3 cp s3://tw-config/config.js ./config.js --region ap-northeast-2
+            git add config.js
+            git commit -m "update release-config.js"
+            sls deploy
 
       - save_cache:
           paths:
