@@ -29,9 +29,13 @@ jobs:
       - run:
           name: Install Serverless CLI and dependencies
           command: |
-            sudo apt-get -y -qq install awscli
             sudo npm i -g serverless
             yarn install
+            apt-get -y -qq update
+            apt-get -y -qq install python3.4-dev
+            curl -O https://bootstrap.pypa.io/get-pip.py
+            python3.4 get-pip.py --user
+            pip install awscli --upgrade --user
             aws s3 cp s3://tw-config/config.js ./ --region ap-northeast-2
 
       - run:
