@@ -3,21 +3,20 @@ language: node_js
 node_js:
   - "6.10"
 
-#node_modules가 포함되지 않음.
-#before_deploy:
-#  - pip install --user awscli
-#  - npm install -g serverless
-#  - aws s3 cp s3://tw-config/config.js ./config.js --region ap-northeast-2
-#  - git add config.js
-#  - git commit -m "update release-config.js"
-#  - npm install --only=production
-#
-#after_deploy:
-#  - npm run e2etest
-#
-#deploy:
-#  - provider: script
-#    script:
-#      - sls deploy -v
-#    on:
-#      branch: master
+before_deploy:
+  - pip install --user awscli
+  - npm install -g serverless
+  - aws s3 cp s3://tw-config/config.js ./config.js --region ap-northeast-2
+  - git add config.js
+  - git commit -m "update release-config.js"
+  - npm install --only=production
+
+after_deploy:
+  - npm run e2etest
+
+deploy:
+  - provider: script
+    script:
+      - sls deploy -v
+    on:
+      branch: master
