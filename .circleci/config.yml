@@ -46,11 +46,6 @@ jobs:
       # run tests!
       - run: yarn test
 
-      - run:
-          name: Deploy application
-          command: |
-            sls deploy
-
   deploy:
     docker:
       # specify the version you desire here
