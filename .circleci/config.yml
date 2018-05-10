@@ -32,13 +32,11 @@ jobs:
             sudo apt-get -y -qq install awscli
             sudo npm i -g serverless
             yarn install
+            aws s3 cp s3://tw-config/config.js ./ --region ap-northeast-2
 
       - run:
           name: Deploy application
           command: |
-            aws s3 cp s3://tw-config/config.js ./config.js --region ap-northeast-2
-            git add config.js
-            git commit -m "update release-config.js"
             sls deploy
 
       - save_cache:
