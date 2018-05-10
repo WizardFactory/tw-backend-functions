@@ -35,17 +35,12 @@ class ControllerGeoCodeDynamdb extends ControllerDynamodb {
 
         console.info(JSON.stringify({getDb:{params: params}}));
 
-        async.retry(2,
+        async.retry(3,
             (callback)=>{
                 let startTime = new Date();
-                this._getDbTimeout(params, 1000, (err, result)=> {
+                this._getDbTimeout(params, 200, (err, result)=> {
                     if (err) {
-                        if (err.code === 'ETIMEDOUT') {
-                            console.error(err);
-                        }
-                        else {
-                            console.warn(err.message);
-                        }
+                        console.warn(err.message);
                     }
                     else {
                         console.info({dynamoResponseTime: new Date().getTime() - startTime.getTime()});
