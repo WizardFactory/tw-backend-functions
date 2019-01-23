@@ -59,7 +59,7 @@ class ControllerDaum extends ControllerExternalApi {
             if(name2){
                 name2 = name2.replace(/ /g,"");
             }
-            geoInfo.kmaAddress = {"region": region[0].region_1depth_name, "city": name2, "town": region[0].region_3depth_name};
+            geoInfo.kmaAddress = {"name1": region[0].region_1depth_name, "name2": name2, "name3": region[0].region_3depth_name};
         }
         return geoInfo;
     }
