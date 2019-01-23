@@ -31,9 +31,9 @@ describe('test function weather', () => {
 
     it('test fail to get request', (done) => {
         let weather = new Weather();
-        // weather._request = function (url, callback ) {
-        //     callback(new Error("Fail to request"));
-        // };
+        weather._request = function (url, callback ) {
+            callback(new Error("Fail to request"));
+        };
 
         weather._coord2geoInfo = function (event, callback) {
             callback(null, { updatedAt: 1514627593387,
