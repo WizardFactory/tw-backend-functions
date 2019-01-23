@@ -198,6 +198,7 @@ class Weather {
                     return callback(err);
                 }
 
+                console.info('URL : ', JSON.stringify(urls));
                 //this._requests(urls, (err, result)=> {
                 this._requestRetry(urls[0], (err, result)=> {
                     if (err) {

@@ -6,6 +6,7 @@
 
 const async = require('async');
 const ControllerDaum = require('./controller.daum');
+const ControllerKakao = require('./controller.kakao');
 const ControllerGoogle = require('./controller.google');
 const ControllerDarksky = require('./controller.darksky');
 
@@ -25,6 +26,15 @@ class GeoApi {
         let lng = loc[1];
         return 39.3769 >= lat && lat >=32.6942 &&
             131.88 >= lng && lng >= 123.9523;
+    }
+
+    _getGeoInfoFromKakaoGeoCode(loc, callback) {
+        //console.log({_getGeoInfoFromKakaoGeoCode:{loc: loc, lang: lang}});
+        let ctrl = new ControllerKakao();
+        ctrl.byGeoCode(loc, (err, result) => {
+            callback(err, result);
+        });
+        return this;
     }
 
     _getGeoInfoFromDaumGeoCode(loc, callback) {
@@ -68,7 +78,7 @@ class GeoApi {
         async.waterfall([
                 (callback) => {
                     if (isKoreaArea) {
-                        this._getGeoInfoFromDaumGeoCode(loc, (err, geoInfo) => {
+                        this._getGeoInfoFromKakaoGeoCode(loc, (err, geoInfo) => {
                             if (err) {
                                 return callback(err);
                             }
@@ -154,6 +164,13 @@ class GeoApi {
         return this;
     }
 
+    _getGeoInfoFromKakaoAddress(addr, callback) {
+        let ctrl = new ControllerKakao();
+        ctrl.byAddress(addr, (err, result) => {
+            callback(err, result);
+        });
+    }
+
     _getGeoInfoFromDaumAddress(addr, callback) {
         let ctrl = new ControllerDaum();
         ctrl.byAddress(addr, (err, result) => {
@@ -180,7 +197,7 @@ class GeoApi {
                     });
                 },
                 (callback) => {
-                    this._getGeoInfoFromDaumAddress(addr, (err, result)=> {
+                    this._getGeoInfoFromKakaoAddress(addr, (err, result)=> {
                         if (err) {
                             return callback(err);
                         }
