@@ -14,7 +14,7 @@ const queryKoSeoul = {locaiton: seoulLocation, lang:'ko'};
 const queryEnSeoul = {locaiton: seoulLocation, lang:'en'};
 const queryTokyo = {locaiton: tokyoLocation, lang:'jp'};
 
-const resultDaumOfSeoul = { country: 'KR',
+const resultKakaoOfSeoul = { country: 'KR',
     address: '서울특별시 송파구 잠실본동',
     label: '잠실본동',
     kmaAddress: { name1: '서울특별시', name2: '송파구', name3: '잠실본동' } };
@@ -36,8 +36,8 @@ describe('test controller geoapi', () => {
 
     it('test geo info query seoul in korea', (done) => {
         let ctrlGeoApi = new ControllerGeoApi();
-        ctrlGeoApi._getGeoInfoFromDaumGeoCode = (location, callback) => {
-            callback(null, resultDaumOfSeoul);
+        ctrlGeoApi._getGeoInfoFromKakaoGeoCode = (location, callback) => {
+            callback(null, resultKakaoOfSeoul);
         };
 
         ctrlGeoApi.getGeoInfoByCoord(queryKoSeoul.locaiton, queryKoSeoul.lang, (err, geoInfo)=> {
@@ -46,8 +46,8 @@ describe('test controller geoapi', () => {
                 console.error(err);
             }
             else {
-                expect(geoInfo.label).to.be.equal(resultDaumOfSeoul.label);
-                expect(geoInfo.kmaAddress.town).to.equal(resultDaumOfSeoul.kmaAddress.town);
+                expect(geoInfo.label).to.be.equal(resultKakaoOfSeoul.label);
+                expect(geoInfo.kmaAddress.town).to.equal(resultKakaoOfSeoul.kmaAddress.town);
                 //console.log(geoInfo);
             }
             done();
@@ -56,8 +56,8 @@ describe('test controller geoapi', () => {
 
     it('test geo info query seoul in english', (done) => {
         let ctrlGeoApi = new ControllerGeoApi();
-        ctrlGeoApi._getGeoInfoFromDaumGeoCode = (location, callback) => {
-            callback(null, resultDaumOfSeoul);
+        ctrlGeoApi._getGeoInfoFromKakaoGeoCode = (location, callback) => {
+            callback(null, resultKakaoOfSeoul);
         };
 
         ctrlGeoApi._getGeoInfoFromGoogleGeoCode = (location, language, callback) => {
@@ -71,7 +71,7 @@ describe('test controller geoapi', () => {
             }
             else {
                 expect(geoInfo.label).to.be.equal(resultGoogleOfSeoul.label);
-                expect(geoInfo.kmaAddress.town).to.equal(resultDaumOfSeoul.kmaAddress.town);
+                expect(geoInfo.kmaAddress.town).to.equal(resultKakaoOfSeoul.kmaAddress.town);
                 //console.log(geoInfo);
             }
             done();
