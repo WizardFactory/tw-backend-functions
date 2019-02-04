@@ -10,7 +10,7 @@ const FunctionGeoInfo = require('../../geoinfo/function.geoinfo');
 
 let event = {
     pathParameters: {
-        addr: encodeURIComponent('서울특별시 송파구 잠실본동')
+        address: encodeURIComponent('서울특별시 송파구 잠실본동')
     }
 };
 
