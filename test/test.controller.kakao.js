@@ -78,7 +78,7 @@ describe('ctrl Kakao', ()=> {
         let ctrlKakao = new ControllerKakao();
         ctrlKakao._setGeoCode(seoulLocation, 'ko');
         let geoInfo = ctrlKakao._coord2geoInfo(body);
-        expect(geoInfo.label).to.equal(body.name);
+        expect(geoInfo.label).to.equal(body.documents[1].region_3depth_name);
         expect(geoInfo.lang).to.equal('ko');
     });
 
@@ -95,7 +95,7 @@ describe('ctrl Kakao', ()=> {
 
         ctrlKakao.byGeoCode(seoulLocation, (err, geoInfo) => {
             console.log(JSON.stringify(geoInfo));
-            expect(geoInfo.label).to.equal(body.name);
+            expect(geoInfo.label).to.equal(body.documents[1].region_3depth_name);
             expect(geoInfo.loc).to.equal(seoulLocation);
             done();
         });
@@ -103,7 +103,7 @@ describe('ctrl Kakao', ()=> {
 
     it('test by address', (done) => {
         let ctrlKakao = new ControllerKakao();
-        ctrlKakao.axios ={
+        ctrlKakao.axios = {
             get: function(){
                 return new Promise((resolve)=>{
                     resolve({data: addressBody});
