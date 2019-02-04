@@ -10,7 +10,7 @@ const ControllerExternalApi = require('./controller.externalapi');
 const config = require('../config');
 const axios = require('axios');
 
-class ControllerDaum extends ControllerExternalApi {
+class ControllerKakao extends ControllerExternalApi {
     constructor() {
         super();
         this.keys = JSON.parse(config.keyString.kakao_keys);
@@ -47,13 +47,13 @@ class ControllerDaum extends ControllerExternalApi {
             geoInfo.country = "KR";
             geoInfo.address = region[0].address_name;
             if(region[0].region_4depth_name !== "") {
-                geoInfo.name = region[0].region_4depth_name;
+                geoInfo.label = region[0].region_4depth_name;
             }else if(region[0].region_3depth_name !== ""){
-                geoInfo.name = region[0].region_3depth_name;
+                geoInfo.label = region[0].region_3depth_name;
             }else if(region[0].region_2depth_name !== ""){
-                geoInfo.name = region[0].region_2depth_name;
+                geoInfo.label = region[0].region_2depth_name;
             }else if (region[0].region_1depth_name !== ""){
-                geoInfo.name = region[0].region_1depth_name;
+                geoInfo.label = region[0].region_1depth_name;
             }
             var name2 = region[0].region_2depth_name;
             if(name2){
@@ -170,4 +170,4 @@ class ControllerDaum extends ControllerExternalApi {
     }
 }
 
-module.exports = ControllerDaum;
+module.exports = ControllerKakao;
