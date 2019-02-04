@@ -28,7 +28,7 @@ class ControllerDaum extends ControllerExternalApi {
         geoInfo.provider = 'kakao';
 
         if(result.meta.total_count < 2){
-            console.debug('It is not korea');
+            console.log('It is not korea');
             return geoInfo;
         }
         // if(result.documents[0].address_name === "일본"){
@@ -36,7 +36,7 @@ class ControllerDaum extends ControllerExternalApi {
         // }
 
         if(result.documents[0].region_1depth_name === ""){
-            console.debug('It is not korea');
+            console.log('It is not korea');
             return geoInfo;
         }
         let region = result.documents.filter(v=>{
