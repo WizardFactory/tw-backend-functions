@@ -14,7 +14,7 @@ describe('test function weather', () => {
         loc: [38.234, 126.123]
     };
 
-    it('test make doamin url', () => {
+    it('test make domain url', () => {
         let weather = new Weather();
         let urls = weather._makeUrls(geoInfo);
         expect(urls.length).to.equal(1);
