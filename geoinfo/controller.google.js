@@ -13,7 +13,15 @@ const config = require('../config');
 class ControllerGoogle extends ControllerExternalApi {
     constructor() {
         super();
-        this.keys = [config.keyString.google_key];
+        if (config.keyString.google_keys) {
+            this.keys = JSON.parse(config.keyString.google_keys);
+            this.keyIndex = Math.floor(Math.random() * this.keys.length);
+        }
+        else {
+            this.keys = [config.keyString.google_key];
+            this.keyIndex = 0;
+        }
+
         this.endpoint = "https://maps.googleapis.com/maps/api/geocode/json";
     }
 
@@ -220,8 +228,8 @@ class ControllerGoogle extends ControllerExternalApi {
         if (this.lang) {
             url += "&language="+this.lang;
         }
-        if (this.keys[0]) {
-            url += "&key="+this.keys[0];
+        if (this.keys[this.keyIndex]) {
+            url += "&key="+this.keys[this.keyIndex];
         }
         else {
             console.warn("google api key is not valid");
@@ -297,8 +305,8 @@ class ControllerGoogle extends ControllerExternalApi {
         let url = this.endpoint;
         url += '?address='+encodeURIComponent(addr);
 
-        if (this.keys[0]) {
-            url += "&key="+this.keys[0];
+        if (this.keys[this.keyIndex]) {
+            url += "&key="+this.keys[this.keyIndex];
         }
         else {
             console.warn("google api key is not valid");

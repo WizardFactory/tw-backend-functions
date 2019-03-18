@@ -653,4 +653,17 @@ describe('ctrl google', ()=> {
             done();
         });
     });
+
+    it('test key change', () => {
+        let ctrlGoogle = new ControllerGoogle();
+        console.log(ctrlGoogle.keys[ctrlGoogle.keyIndex]);
+        ctrlGoogle = new ControllerGoogle();
+        console.log(ctrlGoogle.keys[ctrlGoogle.keyIndex]);
+        ctrlGoogle = new ControllerGoogle();
+        console.log(ctrlGoogle.keys[ctrlGoogle.keyIndex]);
+        ctrlGoogle = new ControllerGoogle();
+        console.log(ctrlGoogle.keys[ctrlGoogle.keyIndex]);
+        ctrlGoogle = new ControllerGoogle();
+        console.log(ctrlGoogle.keys[ctrlGoogle.keyIndex]);
+    });
 });
