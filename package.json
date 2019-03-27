@@ -10,7 +10,7 @@
     "deploy": "sls deploy -v",
     "deploy-geoinfobycoord": "sls deploy -f geoinfobycoord -v",
     "deploy-pro": "sls deploy -s production -v",
-    "postinstall": "npm rebuild grpc --target=6.1.0 --target_arch=x64 --target_platform=linux --target_libc=glibc"
+    "postinstall": "npm rebuild grpc --target=8.1.0 --target_arch=x64 --target_platform=linux --target_libc=glibc"
   },
   "author": "alec kim",
   "dependencies": {
