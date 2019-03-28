@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:6.13
+      - image: circleci/node:8.10
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -36,7 +36,7 @@ jobs:
             /home/circleci/.local/bin/pip install awscli --upgrade --user
             /home/circleci/.local/bin/aws s3 cp s3://tw-config/config.js ./ --region ap-northeast-2
             sudo npm i -g serverless
-            yarn install
+            npm install
 
       - save_cache:
           paths:
@@ -44,12 +44,12 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: yarn test
+      - run: npm test
 
   deploy:
     docker:
       # specify the version you desire here
-      - image: circleci/node:6.13
+      - image: circleci/node:8.10
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -78,7 +78,7 @@ jobs:
             /home/circleci/.local/bin/pip install awscli --upgrade --user
             /home/circleci/.local/bin/aws s3 cp s3://tw-config/config.js ./ --region ap-northeast-2
             sudo npm i -g serverless
-            yarn install
+            npm install
 
       - save_cache:
           paths:
