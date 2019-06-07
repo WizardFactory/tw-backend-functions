@@ -58,7 +58,18 @@ class ScrapeKaqfs {
         let strDate;
         try {
             let aDesc = detections[0].description.split('\n');
-            strDate = aDesc[aDesc.length-2];
+            let i;
+
+            for (i=0; i<aDesc.length; i++) {
+                if (aDesc[i].length >= 19) {
+                    break;
+                }
+            }
+            if (i == aDesc.length) {
+                throw Error("Fail to find date information");
+            }
+
+            strDate = aDesc[i];
             strDate = strDate.slice(0, 19);
             console.info({date:strDate});
         }
